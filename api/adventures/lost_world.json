@@ -1,0 +1,162 @@
+{
+  "id": "lost-world",
+  "title": "Lost World Mission",
+  "description": "Your task is to find the world that was long forgotten.",
+  "player": {
+    "items": [
+      {
+        "id": "0",
+        "name": "torch",
+        "description": "a normal torch",
+        "state": "not lit"
+      }
+    ]
+  },
+  "available_actions": [],
+  "positions": [
+    {
+      "id": "-1",
+      "description": "Your adventure is ended.",
+      "available_actions": []
+    },
+    {
+      "id": "-2",
+      "description": "In the darkness you fell off a staircase and broke your neck. You are dead. Your adventure ends here.",
+      "available_actions": []
+    },
+    {
+      "id": "0",
+      "description": "You are standing in front of a tiny but dangerous dungeon. What will you do?",
+      "available_actions": [
+        {
+          "id": "0",
+          "description": "Go in",
+          "operation": "cp",
+          "position_id": "1",
+          "item_id": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "id": "1",
+          "description": "Quit",
+          "operation": "cp",
+          "position_id": "-1",
+          "item_id": "",
+          "function": null,
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "description": "It appears to be dark inside. After a further few steps you cannot see a thing. What will you do?",
+      "available_actions": [
+        {
+          "id": "10",
+          "description": "Light a torch",
+          "operation": "cis",
+          "position_id": "",
+          "item_id": "0",
+          "function": null,
+          "value": "lit",
+          "active": true
+        },
+        {
+          "id": "11",
+          "description": "Turn back",
+          "operation": "cp",
+          "position_id": "0",
+          "item_id": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "id": "12",
+          "description": "Go in further",
+          "operation": "cp",
+          "position_id": "2",
+          "item_id": "",
+          "function": null,
+          "active": true
+        }
+      ],
+      "entering_actions": [
+        {
+          "id": "101",
+          "description": "",
+          "operation": "con",
+          "position_id": "",
+          "item_id": "",
+          "function": {
+            "condition": [{ "item_id": 0, "state": "lit" }],
+            "change": [
+              {
+                "position_id": "1",
+                "description": "It is fairly light, because you lit a torch. In one direction is the entrance of the dungeon and in the other is a long stone staircase."
+              },
+              {
+                "action_id": "10",
+                "active": false
+              }
+            ]
+          },
+          "value": "",
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "description": "At the base of the staircase the dungeon passage widens and becomes a chamber that is also a junction. There is a way to the right and there is one to the left.",
+      "available_actions": [
+        {
+          "id": "20",
+          "description": "Turn back",
+          "operation": "cp",
+          "position_id": "1",
+          "item_id": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "id": "21",
+          "description": "Go left",
+          "operation": "cp",
+          "position_id": "3",
+          "item_id": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "id": "22",
+          "description": "Go right",
+          "operation": "cp",
+          "position_id": "4",
+          "item_id": "",
+          "function": null,
+          "active": true
+        }
+      ],
+      "entering_actions": [
+        {
+          "id": "201",
+          "description": "",
+          "operation": "con",
+          "position_id": "",
+          "item_id": "",
+          "function": {
+            "condition": [{ "item_id": 0, "state": "not lit" }],
+            "change": [
+              {
+                "position_id": "-2"
+              }
+            ]
+          },
+          "value": "",
+          "active": true
+        }
+      ]
+    }
+  ]
+}
