@@ -1,6 +1,6 @@
 # from adventure_engine.adventure import Adventure
 from enum import StrEnum
-from adventure_engine.adventure_helper import get_item
+from adventure_engine.adventure_helper import get_item, get_position_from_position_list
 
 # from adventure_engine.position import Position
 
@@ -33,27 +33,28 @@ class Action():
             "active": self.active
         }
 
-    def execute(self, adventure):
-        if self.operation == Operation.CHANGE_POSITION:
+    @staticmethod
+    def execute(action, adventure):
+        if action.operation == Operation.CHANGE_POSITION:
             # leaving actions
-            for action in adventure.actual_position.leaving_actions:
-                if action.position == None:
-                    raise f"Not existing position in action {action.id}."
-                action.execute(adventure)
-            adventure.actual_position = self.position
+            for leaving_action in adventure.actual_position.leaving_actions:
+                if leaving_action.position_id == None:
+                    raise f"Not existing position in action {leaving_action.id}."
+                Action.execute(leaving_action, adventure)
+            adventure.actual_position = get_position_from_position_list(adventure.positions, action.position_id)
             # entering actions
-            for action in adventure.actual_position.entering_actions:
-                if action.position == None:
-                    raise f"Not existing position in action {action.id}."
-                action.execute(adventure)
-        elif self.operation == Operation.CHANGE_ITEM_STATE:
-            item = get_item(adventure, self.item.id )
+            for entering_action in adventure.actual_position.entering_actions:
+                if entering_action.position_id == None:
+                    raise f"Not existing position in action {entering_action.id}."
+                Action.execute(entering_action, adventure)
+        elif action.operation == Operation.CHANGE_ITEM_STATE:
+            item = get_item(adventure, action.item_id )
             if item == None:
-               raise f"Not existing item {self.item.id}." 
-            item.state = self.value
-        elif self.operation == Operation.CONDITIONAL:
+               raise f"Not existing item {action.item_id}." 
+            item.state = action.value
+        elif action.operation == Operation.CONDITIONAL:
             condition_met = True
-            for condition_item in self.function.condition:
+            for condition_item in action.function["condition"]:
                 if "item_id" in condition_item:
                     item = get_item(adventure, condition_item["item_id"] )
                     if "name" in condition_item:
@@ -64,7 +65,7 @@ class Action():
                 if not condition_met:
                     break
             else:
-                for change_item in self.function.change:
+                for change_item in action.function["change"]:
                     pass
 
 

@@ -4,6 +4,10 @@ from adventure_engine.adventure_helper import get_info
 
 app = Flask(__name__)
 app.secret_key = "Q8KKJxUmRg"
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = "True"
+# TODO
+# app.config["SESSION_COOKIE_PARTITIONED"] = "True"
 
 def _adventure_files():
     return ["./adventures/dungeon.json", "./adventures/lost_world.json"]
@@ -19,9 +23,11 @@ def _get_adventure(id: str):
 
 def _add_cors_header(response: Response):
     response.headers["Access-Control-Allow-Origin"] ="http://localhost:5173"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+
 
 def _add_access_control_header(response: Response):
-    response.headers["Access-Control-Allow-Headers"] ="content-type"
+    response.headers["Access-Control-Allow-Headers"] = "content-type"
 
 def prefetch_response():
     response = make_response()
@@ -45,8 +51,9 @@ def new():
     # POST
     data = request.get_json()
     adventure = Adventure(data["player"])
-    adventure.load(_get_adventure(data["gameId"])["path"])
+    Adventure.load(_get_adventure(data["gameId"])["path"], adventure)
     session[adventure.id] = adventure.get_serializable()
+    print("ADVENTURE", adventure.id)
     adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
 
     response =  make_response(adventure.actual_position.get_serializable())
@@ -60,10 +67,14 @@ def do():
     # POST
     data = request.get_json()
     adventure_id = data["gameId"]
-    adventure: Adventure = session[adventure_id]
+    adventure: Adventure = Adventure.build(session[adventure_id])
+    print("OLD POSITION",adventure.actual_position.id)
+    print("ACTION TO EXECUTE",data["actionId"])
+    session.pop(adventure_id)
     adventure.do(data["actionId"])
-    # adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
-
+    print("POSITION",adventure.actual_position.id)
+    session[adventure.id] = adventure.get_serializable()
+    # session.modified = True
     response =  make_response(adventure.actual_position.get_serializable())
     _add_cors_header(response)
     return response

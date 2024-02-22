@@ -8,7 +8,7 @@ import { Item } from './gameStyles'
 const Game = ({ state }: { state: Signal<AppState> }) => {
   const position = state.value.actualPosition as Position
 
-  async function action(id: string) {
+  async function callAction(id: string) {
     await takeAction(id)
   }
 
@@ -21,12 +21,16 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
       <p>{position.description}</p>
       <section>
         {position.available_actions.map((a) => (
-          <Item key={a.id}>{a.description}</Item>
+          <Item key={a.id} onClick={() => callAction(a.id)}>
+            {a.description}
+          </Item>
         ))}
       </section>
       <section>
         {position.items.map((i) => (
-          <p onClick={() => action(i.id)}>{i.description}</p>
+          <Item key={i.id} onClick={() => callAction(i.id)}>
+            {i.description}
+          </Item>
         ))}
       </section>
     </MainContainer>

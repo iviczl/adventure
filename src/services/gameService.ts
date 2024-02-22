@@ -73,7 +73,7 @@ export async function doFetch(url: string, options = {}) {
   let error = null
   try {
     const signal = abortController.signal
-    const res = await fetch(url, { ...options, signal })
+    const res = await fetch(url, { ...options, credentials: 'include', signal })
     response = await res.json()
   } catch (problem) {
     abortController.abort()

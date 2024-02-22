@@ -7,7 +7,7 @@ def file_content(file_path: str):
     with open(file_path) as adventure_file:
         return adventure_file.read()
 
-def load_adventure_json(file_path: str):
+def load_json(file_path: str):
     # try:
         with open(file_path) as adventure_file:
             file_content = adventure_file.read()
@@ -16,7 +16,7 @@ def load_adventure_json(file_path: str):
     #     print(f"An error occured: {error}")
 
 def get_info(file_path: str):
-    data: dict = load_adventure_json(file_path)
+    data: dict = load_json(file_path)
     return {"id": data["id"], "title": data["title"], "description" : data["description"]}
 
 def get_position_from_position_list(positions: list, position_id: str):
@@ -30,7 +30,6 @@ def get_action_from_position(position, action_id: str):
     action = next((a for a in position.available_actions if a.id == action_id), None)
     if action == None:
         action = next((a for a in position.entering_actions if a.id == action_id), None)
-
     if action == None:
         action = next((a for a in position.leaving_actions if a.id == action_id), None)
 

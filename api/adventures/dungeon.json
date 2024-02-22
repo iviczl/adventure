@@ -3,6 +3,7 @@
   "title": "Dungeon Mission",
   "description": "Your task is to clear out a dangerous dungeon.",
   "player": {
+    "name": "",
     "items": [
       {
         "id": "0",
@@ -89,7 +90,7 @@
           "position_id": "",
           "item_id": "",
           "function": {
-            "condition": [{ "item_id": 0, "state": "lit" }],
+            "condition": [{ "item_id": "0", "state": "lit" }],
             "change": [
               {
                 "position_id": "1",
@@ -146,7 +147,7 @@
           "position_id": "",
           "item_id": "",
           "function": {
-            "condition": [{ "item_id": 0, "state": "not lit" }],
+            "condition": [{ "item_id": "0", "state": "not lit" }],
             "change": [
               {
                 "position_id": "-2"
