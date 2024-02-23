@@ -1,30 +1,29 @@
 # import json
+from typing import List, Optional
 from adventure_engine.action import Action
 from adventure_engine.item import Item
 from adventure_engine.player import Player
 from adventure_engine.position import Position
 from adventure_engine.adventure_helper import *
 from enum import IntEnum
+from sqlalchemy.orm import Mapped, relationship
+from config import db
 
 class AdventurePhase(IntEnum):
-    NOT_LOADED = -1
-    LOADED = 0
-    STARTED = 1
-    ENDED = 2
+    NOT_LOADED = "-1"
+    LOADED = "0"
+    STARTED = "1"
+    ENDED = "2"
 
-class Adventure():
-    id: str =  ""
-    title: str = ""
-    description: str = ""
-    player: Player
-    positions: list[Position] = []
-    actual_position: Position = None
-    phase: AdventurePhase = AdventurePhase.NOT_LOADED
-    available_actions: list[Action] = []
-
-    def __init__(self, player_name: str = ""):
-        if player_name != "":
-            self.player = Player(player_name) 
+class Adventure(db.Model):
+    id = db.Column(db.String(10), primary_key = True)
+    title: str = db.Column(db.String(60), unique = False, nullable = False)
+    description = db.Column(db.String(100), unique = False, nullable = False)
+    player: Mapped["Player"] = relationship(back_populates="adventure")
+    positions:  Mapped[List["Position"]] = relationship()
+    actual_position: Mapped[Optional["Position"]] = relationship(overlaps="positions")
+    phase: Mapped[str] = db.Column(db.String(), server_default=str(AdventurePhase.NOT_LOADED))
+    available_actions: Mapped[Optional[List["Action"]]] = relationship()
 
     def get_serializable(self):
         return {
@@ -54,7 +53,9 @@ class Adventure():
         adventure.available_actions = list(map(lambda a: Action(**a), data["available_actions"]))
 
         for position_data in data["positions"]:
-            position = Position(position_data["id"], position_data["description"])
+            position = Position()
+            position.id = position_data["id"]
+            position.description = position_data["description"]
             adventure.positions.append(position)
             if "items" in position_data:
                 position.items = list(map(lambda i: Item(**i), position_data["items"]))

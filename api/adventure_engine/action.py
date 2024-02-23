@@ -1,6 +1,10 @@
 # from adventure_engine.adventure import Adventure
 from enum import StrEnum
+
+from sqlalchemy import ForeignKey
+from config import db
 from adventure_engine.adventure_helper import get_item, get_position_from_position_list
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # from adventure_engine.position import Position
 
@@ -10,16 +14,17 @@ class Operation(StrEnum):
   #  CHANGE_ADVENTURE_STATE = "cas"
    CONDITIONAL = "con"
 
-class Action():
-    def __init__(self, id: str, description: str, operation: Operation, position_id: str = None, value: str = None, item_id: str = None, function: dict = None, active: bool = True):
-        self.id = id
-        self.description = description
-        self.operation = operation
-        self.position_id = position_id
-        self.value = value
-        self.item_id = item_id
-        self.function = function
-        self.active = active
+class Action(db.Model):
+    id = db.Column(db.String(10), primary_key = True)
+    description = db.Column(db.String(100), unique = False, nullable = False)
+    operation = db.Column(db.String(10), unique = False, nullable = False)
+    position_id = db.Column(db.String(10), unique = False, nullable = True)
+    value = db.Column(db.String(40), unique = False, nullable = True)
+    item_id = db.Column(db.String(10), unique = False, nullable = True)
+    function = db.Column(db.String(500), unique = False, nullable = True)
+    active = db.Column(db.Boolean, default = True, nullable = True )
+    available_actions_position_id: Mapped[str] = mapped_column(ForeignKey("position.id"))
+    available_actions_adventure_id: Mapped[str] = mapped_column(ForeignKey("adventure.id"))
 
     def get_serializable(self):
         return { 

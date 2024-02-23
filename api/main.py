@@ -1,13 +1,12 @@
-from flask import Flask, Request, Response, request, make_response, session
+from flask import Response, jsonify, request, make_response, session
 from adventure_engine.adventure import Adventure
 from adventure_engine.adventure_helper import get_info
+from config import app, db
 
-app = Flask(__name__)
-app.secret_key = "Q8KKJxUmRg"
-app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = "True"
-# TODO
-# app.config["SESSION_COOKIE_PARTITIONED"] = "True"
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+        app.run(debug = True)
 
 def _adventure_files():
     return ["./adventures/dungeon.json", "./adventures/lost_world.json"]
@@ -21,65 +20,64 @@ def _adventures():
 def _get_adventure(id: str):
     return next((a for a in _adventures() if a["info"]["id"] == id), None)
 
-def _add_cors_header(response: Response):
-    response.headers["Access-Control-Allow-Origin"] ="http://localhost:5173"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-
-
-def _add_access_control_header(response: Response):
-    response.headers["Access-Control-Allow-Headers"] = "content-type"
-
-def prefetch_response():
-    response = make_response()
-    _add_cors_header(response)
-    _add_access_control_header(response)
-    return response
-
-
 @app.route("/")
 def main():
-    # adv = _adventures()
-    # print(adv)
     response =  make_response(list(map(lambda a: a["info"], _adventures())))
-    _add_cors_header(response)
     return response
 
 @app.route("/new", methods=["POST","OPTIONS"])
 def new():
     if request.method =="OPTIONS":
-        return prefetch_response()
+        return ""
     # POST
-    data = request.get_json()
-    adventure = Adventure(data["player"])
-    Adventure.load(_get_adventure(data["gameId"])["path"], adventure)
-    session[adventure.id] = adventure.get_serializable()
-    print("ADVENTURE", adventure.id)
+    player_name = request.json.get("player")
+    adventure_id = request.json.get("gameId")
+
+    if not player_name or not adventure_id:
+        return (jsonify({"message": "player and gameId arguments are mandatory."}), 400)
+
+    adventure = Adventure() # (player_name)
+    Adventure.load(_get_adventure(adventure_id)["path"], adventure)
+    adventure.player.name = player_name
     adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
+    try:
+        db.session.add(adventure)
+        db.session.commit()
+        session[adventure.id] = player_name # adventure.get_serializable()
+    except Exception as e:
+        return jsonify({ "message": str(e)}), 400
 
     response =  make_response(adventure.actual_position.get_serializable())
-    _add_cors_header(response)
-    return response
+    return response, 201
 
 @app.route("/do", methods=["POST","OPTIONS"])
 def do():
     if request.method =="OPTIONS":
-       return prefetch_response()
+       return ""
     # POST
-    data = request.get_json()
-    adventure_id = data["gameId"]
-    adventure: Adventure = Adventure.build(session[adventure_id])
+    adventure_id = request.json.get("gameId")
+    action_id = request.json.get("actionId")
+
+    if not adventure_id or not action_id:
+        return (jsonify({"message": "actionId and gameId arguments are mandatory."}), 400)
+
+    adventure = Adventure.build(session[adventure_id])
     print("OLD POSITION",adventure.actual_position.id)
-    print("ACTION TO EXECUTE",data["actionId"])
+    print("ACTION TO EXECUTE",action_id)
     session.pop(adventure_id)
-    adventure.do(data["actionId"])
+    adventure.do(action_id)
     print("POSITION",adventure.actual_position.id)
     session[adventure.id] = adventure.get_serializable()
     # session.modified = True
     response =  make_response(adventure.actual_position.get_serializable())
-    _add_cors_header(response)
     return response
 
-@app.route("/quit")
+@app.route("/quit", methods =["DELETE"])
 def quit():
-    session.pop(Request.get_json().name)
+    adventure_id = request.json.get("gameId")
+
+    if not adventure_id:
+        return (jsonify({"message": "gameId argument is mandatory."}), 400)
+
+    session.pop(adventure_id)
 
