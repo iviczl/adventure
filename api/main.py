@@ -20,6 +20,24 @@ def _adventures():
 def _get_adventure(id: str):
     return next((a for a in _adventures() if a["info"]["id"] == id), None)
 
+ADVENTURE = "adventure"
+
+def _authenticate(keys):
+    adventure_id = session[ADVENTURE]
+    if not adventure_id:
+        return False, (jsonify({"message": "You should choose a game first."}), 400)
+        
+    values = {}
+    for key in keys:
+        value = request.json.get(key)
+        if value:
+            values[key] = value
+        else:
+            return False, (jsonify({"message": f"{key} argument is mandatory."}), 400)
+
+    values[ADVENTURE] = adventure_id
+    return True, None, values
+
 @app.route("/")
 def main():
     response =  make_response(list(map(lambda a: a["info"], _adventures())))
@@ -31,19 +49,21 @@ def new():
         return ""
     # POST
     player_name = request.json.get("player")
-    adventure_id = request.json.get("gameId")
+    game_id = request.json.get("gameId")
 
-    if not player_name or not adventure_id:
+    if not player_name or not game_id:
         return (jsonify({"message": "player and gameId arguments are mandatory."}), 400)
 
     adventure = Adventure() # (player_name)
-    Adventure.load(_get_adventure(adventure_id)["path"], adventure)
+    Adventure.load(_get_adventure(game_id)["path"], adventure)
     adventure.player.name = player_name
-    adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
+    # adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
     try:
         db.session.add(adventure)
+        print("ACTUAL POSITION",adventure.actual_position.code)
         db.session.commit()
-        session[adventure.id] = player_name # adventure.get_serializable()
+        print("ACTUAL POSITION",adventure.actual_position.code)
+        session[ADVENTURE] = adventure.id # adventure.get_serializable()
     except Exception as e:
         return jsonify({ "message": str(e)}), 400
 
@@ -55,29 +75,31 @@ def do():
     if request.method =="OPTIONS":
        return ""
     # POST
-    adventure_id = request.json.get("gameId")
-    action_id = request.json.get("actionId")
+    has_rights, response, values = _authenticate(["actionId"])
+    if not has_rights:
+        return response
+    try:
+        adventure = Adventure.query.get(values[ADVENTURE])
+        # adventure = Adventure.build(session[values["game_id"]])
+        print("OLD POSITION",adventure.actual_position.code)
+        print("ACTION TO EXECUTE",values["actionId"])
+        # session.pop(game_id)
+        adventure.do(values["actionId"])
+        db.session.commit()
+        print("POSITION",adventure.actual_position.code)
+        # session[adventure.id] = adventure.get_serializable()
+        # session.modified = True
+    except Exception as e:
+        return jsonify({ "message": str(e)}), 400
 
-    if not adventure_id or not action_id:
-        return (jsonify({"message": "actionId and gameId arguments are mandatory."}), 400)
-
-    adventure = Adventure.build(session[adventure_id])
-    print("OLD POSITION",adventure.actual_position.id)
-    print("ACTION TO EXECUTE",action_id)
-    session.pop(adventure_id)
-    adventure.do(action_id)
-    print("POSITION",adventure.actual_position.id)
-    session[adventure.id] = adventure.get_serializable()
-    # session.modified = True
     response =  make_response(adventure.actual_position.get_serializable())
     return response
 
 @app.route("/quit", methods =["DELETE"])
 def quit():
-    adventure_id = request.json.get("gameId")
+    has_rights, response, values = _authenticate()
+    if not has_rights:
+        return response
 
-    if not adventure_id:
-        return (jsonify({"message": "gameId argument is mandatory."}), 400)
-
-    session.pop(adventure_id)
+    session.pop(values[ADVENTURE])
 

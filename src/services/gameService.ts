@@ -3,10 +3,11 @@ import { state } from '../state'
 import { GameInfo } from '../types/gameInfo'
 
 let abortController: AbortController
+const apiBasePath = 'http://127.0.0.1:5000'
 
 export async function getGames() {
   abortController = new AbortController()
-  const result = await doFetch('http://127.0.0.1:5000/')
+  const result = await doFetch(`${apiBasePath}/`)
 
   if (assertError(result)) {
     return
@@ -23,7 +24,7 @@ export async function getGames() {
 
 export async function startGame(gameId: string, player: string) {
   abortController = new AbortController()
-  const result = await doFetch('http://127.0.0.1:5000/new', {
+  const result = await doFetch(`${apiBasePath}/new`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ gameId, player }),
@@ -44,10 +45,10 @@ export async function startGame(gameId: string, player: string) {
 
 export async function takeAction(actionId: string) {
   abortController = new AbortController()
-  const result = await doFetch('http://127.0.0.1:5000/do', {
+  const result = await doFetch(`${apiBasePath}/do`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gameId: state.value.selectedGameId, actionId }),
+    body: JSON.stringify({ actionId }),
   })
 
   if (assertError(result)) {

@@ -9,7 +9,7 @@ app.config["CORS_ALLOW_HEADERS"] = ["content-type"]
 app.config["CORS_SUPPORTS_CREDENTIALS"] = True
 CORS(app)
 
-app.secret_key = "Q8KKJxUmRg"
+app.secret_key = "ebc16afd0bdb79e9c6748e15e7e832e20c101decce69326cee610204ba466eeb"
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = "True"
 # TODO

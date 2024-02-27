@@ -1,4 +1,5 @@
 # import json
+from json import dumps
 from typing import List, Optional
 from adventure_engine.action import Action
 from adventure_engine.item import Item
@@ -16,7 +17,8 @@ class AdventurePhase(IntEnum):
     ENDED = "2"
 
 class Adventure(db.Model):
-    id = db.Column(db.String(10), primary_key = True)
+    id = db.Column(db.Integer(), primary_key = True, autoincrement = True)
+    game_id = db.Column(db.String(10), unique = False, nullable = False)
     title: str = db.Column(db.String(60), unique = False, nullable = False)
     description = db.Column(db.String(100), unique = False, nullable = False)
     player: Mapped["Player"] = relationship(back_populates="adventure")
@@ -41,35 +43,30 @@ class Adventure(db.Model):
     def build(data, adventure = None):
         if adventure == None:
             adventure = Adventure()
-        adventure.id = data["id"]
+        adventure.game_id = data["id"]
         adventure.player =  Player(data["player"]["name"])
         adventure.title = data["title"]
         adventure.description = data["description"]
         adventure.phase = AdventurePhase.LOADED
         if "items" in data["player"]:
-            # print("!player items!",data["player"]["items"])
-            # return
-            adventure.player.items = list(map(lambda i: Item(**i), data["player"]["items"]))
-        adventure.available_actions = list(map(lambda a: Action(**a), data["available_actions"]))
+            adventure.player.items = list(map(lambda i: Item(**i), prepare_items(data["player"]["items"])))
+        adventure.available_actions = list(map(lambda a: Action(**a), prepare_actions(data["available_actions"])))
 
         for position_data in data["positions"]:
             position = Position()
-            position.id = position_data["id"]
+            position.code = position_data["id"]
             position.description = position_data["description"]
             adventure.positions.append(position)
             if "items" in position_data:
-                position.items = list(map(lambda i: Item(**i), position_data["items"]))
+                position.items = list(map(lambda i: Item(**i), prepare_items(position_data["items"])))
             if "available_actions" in position_data:
-                position.available_actions = list(map(lambda a: Action(**a), position_data["available_actions"]))
+                position.available_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["available_actions"])))
             if "entering_actions" in position_data:
-                position.entering_actions = list(map(lambda a: Action(**a), position_data["entering_actions"]))
+                position.entering_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["entering_actions"])))
             if "leaving_actions" in position_data:
-                position.leaving_actions = list(map(lambda a: Action(**a), position_data["leaving_actions"]))
+                position.leaving_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["leaving_actions"])))
 
-        actual_position_id = "0"
-        if "actual_position" in data and data["actual_position"] != None:
-            actual_position_id = data["actual_position"]["id"]
-        adventure.actual_position = get_position_from_position_list(adventure.positions, actual_position_id)
+        adventure.actual_position = get_position_from_position_list(adventure.positions, "0")
         return adventure
 
     @staticmethod
@@ -77,13 +74,13 @@ class Adventure(db.Model):
         rawData = load_json(file_path)
         return Adventure.build(rawData, adventure)
 
-    def do(self, action_id: str):
+    def do(self, action_code: str):
         action: Action = None
         if self.actual_position != None:
-            action = get_action_from_position(self.actual_position, action_id)
+            action = get_action_from_position(self.actual_position, action_code)
         if action == None and len(self.available_actions) > 0:
-            action = next((a for a in self.available_actions if a.id == action_id), None)
+            action = next((a for a in self.available_actions if a.code == action_code), None)
         if action == None:
-            raise RuntimeError(f"Invalid action id in position: {self.actual_position.id + ":" + action_id}")
-        print("EXECUTING ACTION",action.id)
+            raise RuntimeError(f"Invalid action code in position: {self.actual_position.id + ":" + action_code}")
+        print("EXECUTING ACTION",action.code)
         Action.execute(action, self)
