@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 class Player(db.Model):
     id = db.Column(db.Integer(), primary_key = True, autoincrement = True)
     name = db.Column(db.String(40), unique = False, nullable = False)
-    items: Mapped[List["Item"]] = relationship()
+    items: Mapped[List["Item"]] = relationship(foreign_keys="[Item.player_id]")
     adventure_id: Mapped[int] = mapped_column(Integer(), ForeignKey("adventure.id"))
     adventure: Mapped["Adventure"] = relationship(back_populates="player", single_parent=True)
 

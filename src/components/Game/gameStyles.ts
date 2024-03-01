@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const Item = styled.p`
   margin: 0;
   padding: 0.5rem;
-  border-radius: 50% 0 50% 0;
+  border-radius: 0.8rem;
 
   &:hover {
     background-color: #aa8866;

@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy import ForeignKey, String, Integer
 from config import db
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class Item(db.Model):
     id = db.Column(db.Integer(), primary_key = True, autoincrement = True)
@@ -14,7 +14,7 @@ class Item(db.Model):
 
     def get_serializable(self):
         return {
-            "id": self.id,
+            # "id": self.id,
             "code": self.code,
             "name": self.name,
             "description": self.description,

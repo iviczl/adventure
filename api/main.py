@@ -1,7 +1,10 @@
+from os import listdir
 from flask import Response, jsonify, request, make_response, session
-from adventure_engine.adventure import Adventure
+from adventure_engine.adventure import Adventure, Position
 from adventure_engine.adventure_helper import get_info
 from config import app, db
+
+ADVENTURE_PATH = "./adventures/"
 
 if __name__ == "__main__":
     with app.app_context():
@@ -9,7 +12,11 @@ if __name__ == "__main__":
         app.run(debug = True)
 
 def _adventure_files():
-    return ["./adventures/dungeon.json", "./adventures/lost_world.json"]
+    files = listdir(ADVENTURE_PATH)
+    if len(files) == 0:
+        return files
+    return map(lambda adventure: ADVENTURE_PATH + adventure ,filter(lambda file: file.endswith(".json") ,files))
+    # return ["./adventures/dungeon.json", "./adventures/lost_world.json"]
 
 def _adventures():
     adventures: list = []
@@ -57,13 +64,11 @@ def new():
     adventure = Adventure() # (player_name)
     Adventure.load(_get_adventure(game_id)["path"], adventure)
     adventure.player.name = player_name
-    # adventure.actual_position = next((p for p in adventure.positions if p.id == "0"), None)
     try:
         db.session.add(adventure)
-        print("ACTUAL POSITION",adventure.actual_position.code)
+        print("ADVENTURE ID",adventure.id)
         db.session.commit()
-        print("ACTUAL POSITION",adventure.actual_position.code)
-        session[ADVENTURE] = adventure.id # adventure.get_serializable()
+        session[ADVENTURE] = adventure.id 
     except Exception as e:
         return jsonify({ "message": str(e)}), 400
 
@@ -80,15 +85,11 @@ def do():
         return response
     try:
         adventure = Adventure.query.get(values[ADVENTURE])
-        # adventure = Adventure.build(session[values["game_id"]])
         print("OLD POSITION",adventure.actual_position.code)
         print("ACTION TO EXECUTE",values["actionId"])
-        # session.pop(game_id)
         adventure.do(values["actionId"])
         db.session.commit()
         print("POSITION",adventure.actual_position.code)
-        # session[adventure.id] = adventure.get_serializable()
-        # session.modified = True
     except Exception as e:
         return jsonify({ "message": str(e)}), 400
 

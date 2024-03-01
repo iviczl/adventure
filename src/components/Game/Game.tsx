@@ -21,7 +21,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
       <p>{position.description}</p>
       <section>
         {position.available_actions.map((a) => (
-          <Item key={a.id} onClick={() => callAction(a.id)}>
+          <Item key={a.code} onClick={() => callAction(a.code)}>
             {a.description}
           </Item>
         ))}

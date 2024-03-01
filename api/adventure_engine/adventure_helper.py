@@ -17,14 +17,22 @@ def load_json(file_path: str):
 
 def get_info(file_path: str):
     data: dict = load_json(file_path)
-    return {"id": data["id"], "title": data["title"], "description" : data["description"]}
+    return {"id": data["code"], "title": data["title"], "description" : data["description"]}
 
 def get_position_from_position_list(positions: list, position_code: str):
     return next((p for p in positions if p.code == position_code), None)
 
+def get_action(adventure, action_code: str):
+    action = get_action_from_position_list(adventure.positions, action_code)
+    if not action:
+        action = next((a for a in adventure.available_actions if a.code == action_code), None)
+    return action
+
 def get_action_from_position_list(positions: list, action_code: str):
     for position in positions:
-        return get_action_from_position(position, action_code)
+        action = get_action_from_position(position, action_code)
+        if action:
+            return action
     
 def get_action_from_position(position, action_code: str):
     action = next((a for a in position.available_actions if a.code == action_code), None)
@@ -58,15 +66,15 @@ def change_key(dictionary: dict, old_key: str, new_key:str ):
         dictionary.pop(old_key)
         dictionary[new_key] = value
 
-def prepare_actions(actions: list):
-    stringify_action_functions(actions)
-    for action in actions:
-        change_dict_keys(action, { "id": "code", "position_id": "position_code", "item_id": "item_code"})
+# def prepare_actions(actions: list):
+#     stringify_action_functions(actions)
+#     for action in actions:
+#         change_dict_keys(action, { "id": "code", "position_id": "position_code", "item_id": "item_code"})
 
-    return actions
+#     return actions
 
-def prepare_items(items: list):
-    for item in items:
-        change_dict_keys(item, { "id": "code"})
+# def prepare_items(items: list):
+#     for item in items:
+#         change_dict_keys(item, { "id": "code"})
 
-    return items
+#     return items

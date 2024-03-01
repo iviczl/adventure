@@ -1,4 +1,4 @@
 export type Action = {
-  id: string
+  code: string
   description: string
 }
