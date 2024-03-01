@@ -17,7 +17,7 @@ padding: auto;
 export default GlobalStyle
 
 export const MainHeading = styled.h1`
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(1.5rem, 6vw, 5rem);
   margin-bottom: 1rem;
   margin-top: 2rem;
 `
@@ -33,12 +33,14 @@ export const MainContainer = styled.div`
   border-radius: clamp(5px, 20px, 25px);
 `
 export const Container = styled.div`
-  margin: 10vh 10vh;
+  margin-left: auto;
+  margin-right: auto;
   padding: 3rem;
   display: flex;
   flex-flow: column;
   place-items: center;
   min-width: 320px;
+  max-width: 800px;
   min-height: 10vh;
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
@@ -80,10 +82,20 @@ export const Paragraph = styled.p`
 
 export const Label = styled.label`
   font-size: 1rem;
+  margin-left: ${(props) => props.$marginLeft || '1rem'};
   font-weight: 500;
   font-family: inherit;
   line-height: 0.8rem; //calc(2.2rem + 2px);
   padding: 0.5rem 0;
+  width: ${(props) => props.$width || 'unset'};
+`
+export const Option = styled.option`
+  padding: 0.6rem 0.6rem 0.6rem 0.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: white;
+  color: #331111;
 `
 export const Select = styled.select`
   border-radius: 8px;
@@ -95,7 +107,8 @@ export const Select = styled.select`
   background-color: white;
   color: #331111;
   border: solid 1px #331111;
-  max-width: 10rem;
+  max-width: 12rem;
+  width: ${(props) => props.$width || 'unset'};
 
   cursor: pointer;
   transition: border-color 0.25s;
@@ -122,7 +135,8 @@ export const Input = styled.input`
   background-color: white;
   color: #331111;
   border: solid 1px #331111;
-  max-width: 10rem;
+  max-width: 12rem;
+  width: ${(props) => props.$width || 'unset'};
 
   cursor: pointer;
   transition: border-color 0.25s;

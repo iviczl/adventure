@@ -11,8 +11,9 @@ import {
   Select,
   Label,
   Paragraph,
+  Option,
 } from '../../globalStyles'
-import { Row, StartGrid } from './homeStyles'
+import { Description, Row, StartGrid } from './homeStyles'
 
 export default function Home({ state }: { state: Signal<AppState> }) {
   const [player, setPlayer] = useState('')
@@ -25,9 +26,9 @@ export default function Home({ state }: { state: Signal<AppState> }) {
   function gameItem(game: GameInfo) {
     if (!game) return
     return (
-      <option key={game.id} value={game.id}>
+      <Option key={game.id} value={game.id}>
         {game.title}
-      </option>
+      </Option>
     )
   }
 
@@ -52,25 +53,29 @@ export default function Home({ state }: { state: Signal<AppState> }) {
     <Container>
       <MainHeading>Adventure games</MainHeading>
       <Paragraph>
-        Select the game, state your name and press Start to begin.
+        Select a game, state your name and press Start to begin.
       </Paragraph>
       <StartGrid>
-        <Label>Games to choose from:</Label>
-        <Select
-          $marginLeft='0'
-          onChange={(e) => setSelectedGameId(e.target.value)}
-        >
-          <option value=''>(Select an option)</option>
-          {state.value.games && state.value.games.map(gameItem)}
-        </Select>
-        <div>{selectedGameDescription()}</div>
-        <Label>Player name:</Label>
-        <Input
-          type='text'
-          $marginLeft='0'
-          onChange={(e) => setPlayer(e.target.value)}
-          value={player}
-        />
+        <Row>
+          <Label $width='10rem'>Games to choose from:</Label>
+          <Select
+            $width='12rem'
+            onChange={(e) => setSelectedGameId(e.target.value)}
+          >
+            <Option value=''>(Select an option)</Option>
+            {state.value.games && state.value.games.map(gameItem)}
+          </Select>
+        </Row>
+        <Description>{selectedGameDescription()}</Description>
+        <Row>
+          <Label $width='10rem'>Player name:</Label>
+          <Input
+            $width='12rem'
+            type='text'
+            onChange={(e) => setPlayer(e.target.value)}
+            value={player}
+          />
+        </Row>
       </StartGrid>
       <Row>
         <Button onClick={start} disabled={!selectedGameId || !player}>
