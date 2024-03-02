@@ -4,12 +4,16 @@ import { AppState } from '../../state'
 import { takeAction } from '../../services/gameService'
 import { MainContainer } from '../../globalStyles'
 import { Item } from './gameStyles'
+import { useState } from 'react'
 
 const Game = ({ state }: { state: Signal<AppState> }) => {
   const position = state.value.actualPosition as Position
+  const [requestProcessing, setRequestProcessing] = useState(false)
 
   async function callAction(id: string) {
+    setRequestProcessing(true)
     await takeAction(id)
+    setRequestProcessing(false)
   }
 
   if (!state.value.selectedGameId) {
@@ -21,18 +25,26 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
       <p>{position.description}</p>
       <section>
         {position.available_actions.map((a) => (
-          <Item key={a.code} onClick={() => callAction(a.code)}>
+          <Item
+            key={a.code}
+            onClick={() => callAction(a.code)}
+            disabled={requestProcessing}
+          >
             {a.description}
           </Item>
         ))}
       </section>
-      <section>
+      {/* <section>
         {position.items.map((i) => (
-          <Item key={i.id} onClick={() => callAction(i.id)}>
+          <Item
+            key={i.id}
+            onClick={() => callAction(i.id)}
+            disabled={requestProcessing}
+          >
             {i.description}
           </Item>
         ))}
-      </section>
+      </section> */}
     </MainContainer>
   )
 }

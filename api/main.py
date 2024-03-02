@@ -1,5 +1,5 @@
 from os import listdir
-from flask import Response, jsonify, request, make_response, session
+from flask import jsonify, request, make_response, session
 from adventure_engine.adventure import Adventure, Position
 from adventure_engine.adventure_helper import get_info
 from config import app, db

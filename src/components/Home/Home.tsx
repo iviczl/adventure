@@ -18,9 +18,12 @@ import { Description, Row, StartGrid } from './homeStyles'
 export default function Home({ state }: { state: Signal<AppState> }) {
   const [player, setPlayer] = useState('')
   const [selectedGameId, setSelectedGameId] = useState('')
+  const [requestProcessing, setRequestProcessing] = useState(false)
 
   async function start() {
+    setRequestProcessing(true)
     await startGame(selectedGameId, player)
+    setRequestProcessing(false)
   }
 
   function gameItem(game: GameInfo) {
@@ -78,7 +81,10 @@ export default function Home({ state }: { state: Signal<AppState> }) {
         </Row>
       </StartGrid>
       <Row>
-        <Button onClick={start} disabled={!selectedGameId || !player}>
+        <Button
+          onClick={start}
+          disabled={!selectedGameId || !player || requestProcessing}
+        >
           Start
         </Button>
       </Row>
