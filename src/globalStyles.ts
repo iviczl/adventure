@@ -22,15 +22,16 @@ export const MainHeading = styled.h1`
   margin-top: 2rem;
 `
 export const MainContainer = styled.div`
-  margin: 0;
+  margin: auto;
   background-color: #cc9977;
   display: flex;
   place-items: center;
   flex-flow: column;
   min-width: 320px;
-  min-height: 90vh;
+  height: 90vh;
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
+  padding: 1rem;
 `
 export const Container = styled.div`
   margin-left: auto;

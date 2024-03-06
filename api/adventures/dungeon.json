@@ -27,7 +27,7 @@
     },
     {
       "code": "0",
-      "description": "You are standing in front of a tiny but dangerous dungeon. What will you do?",
+      "description": "You come clear of the forest to a clearing and now you are standing in front of a tiny but dangerous dungeon. What will you do?",
       "available_actions": [
         {
           "code": "0",
@@ -56,11 +56,8 @@
         {
           "code": "10",
           "description": "Light a torch",
-          "operation": "cis",
-          "position_code": "",
-          "item_code": "0",
-          "function": null,
-          "value": "lit",
+          "operation": "ls",
+          "action_codes": ["13", "14", "15"],
           "active": true
         },
         {
@@ -68,7 +65,6 @@
           "description": "Turn back to the entrance",
           "operation": "cp",
           "position_code": "0",
-          "item_code": "",
           "function": null,
           "active": true
         },
@@ -77,9 +73,34 @@
           "description": "Go in further",
           "operation": "cp",
           "position_code": "2",
-          "item_code": "",
           "function": null,
           "active": true
+        },
+        {
+          "code": "13",
+          "description": "Light a torch",
+          "operation": "cis",
+          "item_code": "0",
+          "value": "lit",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "14",
+          "description": "position description change",
+          "operation": "cpd",
+          "position_description": "It is fairly light, because you lit a torch. In one direction is the entrance of the dungeon and in the other is a long stone staircase that leads downward.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "15",
+          "description": "action active change",
+          "operation": "caa",
+          "action_code": "10",
+          "action_active": false,
+          "active": true,
+          "visible": false
         }
       ],
       "entering_actions": [
@@ -90,17 +111,8 @@
           "position_code": "",
           "item_code": "",
           "function": {
-            "condition": [{ "item_code": "0", "state": "lit" }],
-            "change": [
-              {
-                "position_code": "1",
-                "description": "It is fairly light, because you lit a torch. In one direction is the entrance of the dungeon and in the other is a long stone staircase that leads downward."
-              },
-              {
-                "action_code": "10",
-                "active": false
-              }
-            ]
+            "conditions": [{ "item_code": "0", "state": "lit" }],
+            "action_codes": ["14", "15"]
           },
           "value": "",
           "active": true
@@ -109,7 +121,7 @@
     },
     {
       "code": "2",
-      "description": "At the base of the staircase the dungeon passage widens and becomes a chamber that is also a junction. Seeing from the staircase there is a way to the right and there is one to the left.",
+      "description": "At the base of the staircase the dungeon passage widens and becomes a chamber that is also a junction. Seeing from the staircase there is a way to the right, one forward and there is one to the left. To the left you cannot see much and the way takes a turn somewhere. To the right you can see great darkness and the walls damply glistens. Forward is a clear way with smooth stone floor but some slight bad smell lingers, like in some lizard den.",
       "available_actions": [
         {
           "code": "20",
@@ -124,7 +136,7 @@
           "code": "21",
           "description": "Go left",
           "operation": "cp",
-          "position_code": "3",
+          "position_code": "8",
           "item_code": "",
           "function": null,
           "active": true
@@ -133,10 +145,27 @@
           "code": "22",
           "description": "Go right",
           "operation": "cp",
-          "position_code": "4",
+          "position_code": "5",
           "item_code": "",
           "function": null,
           "active": true
+        },
+        {
+          "code": "23",
+          "description": "Go forward",
+          "operation": "cp",
+          "position_code": "3",
+          "item_code": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "24",
+          "description": "position change",
+          "operation": "cp",
+          "position_code": "-2",
+          "active": true,
+          "visible": false
         }
       ],
       "entering_actions": [
@@ -147,14 +176,218 @@
           "position_code": "",
           "item_code": "",
           "function": {
-            "condition": [{ "item_code": "0", "state": "not lit" }],
-            "change": [
-              {
-                "position_code": "-2"
-              }
-            ]
+            "conditions": [{ "item_code": "0", "state": "not lit" }],
+            "action_codes": ["24"]
           },
           "value": "",
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "3",
+      "description": "You arrived to a small round chamber that looks like some man made cellar. You look around and see nothing except some tattered rags next to the wall on the floor. The walls are smooth and seeing sooth on the arched ceiling indicates someone else also used a torch here. The only other way apart from the entrance is a narrow doorway forward from where a really foul stench comes.",
+      "items": [
+        {
+          "code": "1",
+          "name": "knife",
+          "description": "sturdy knife with elaborate handle",
+          "state": "in bag"
+        }
+      ],
+      "available_actions": [
+        {
+          "code": "30",
+          "description": "Turn back to the junction",
+          "operation": "cp",
+          "position_code": "2",
+          "item_code": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "31",
+          "description": "Go forward",
+          "operation": "cp",
+          "position_code": "4",
+          "item_code": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "32",
+          "description": "Pick up the rag from the floor",
+          "operation": "ls",
+          "action_codes": ["33", "34", "35"],
+          "active": true
+        },
+        {
+          "code": "33",
+          "description": "pick up knife",
+          "operation": "pui",
+          "item_code": "1",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "34",
+          "description": "pick up knife desc",
+          "operation": "cpd",
+          "position_description": "As you pick up the rag you realise that it is heavier than you thought. You unwrap it and find a knife with a nice handle in it. It has comfortable grip so you think it must be good practically too. You put it in your bag.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "35",
+          "description": "inactivate 32",
+          "operation": "caa",
+          "action_code": "32",
+          "action_active": false,
+          "active": true,
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "301",
+          "description": "has the knife",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "player_must_have": true, "item_code": "1" }],
+            "action_codes": ["35"]
+          },
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "4",
+      "description": "As you advancing forward the smell becomes really stomach lurching so you become very nervous. You arrive to a huge room where you cannot see anything but your immediate surroundings. As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
+      "available_actions": [
+        {
+          "code": "40",
+          "description": "Make your move",
+          "operation": "ran",
+          "action_codes": ["41", "42"],
+          "active": true
+        },
+        {
+          "code": "41",
+          "description": "lucky end",
+          "operation": "cp",
+          "position_code": "-4",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "42",
+          "description": "unlucky end",
+          "operation": "cp",
+          "position_code": "-3",
+          "active": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "code": "-3",
+      "description": "You turn around on your heel quickly, but somewhat late. You sense as two sharp object deepens in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
+      "available_actions": []
+    },
+    {
+      "code": "-4",
+      "description": "Your jump on your left while turning around. As you turn you still see a big snake demon in front of you, but your left arm goes numb and you know the demon bit you. You quickly run to the entrance and hastly quit the dungeon. Your adventure ends here.",
+      "available_actions": []
+    },
+    {
+      "code": "5",
+      "description": "As you go in the route the floor and the walls become dark and moist and slippery in places. You become somewhat nervous as you can hear small noises like small legs advance carefully and sneaky.",
+      "available_actions": [
+        {
+          "code": "50",
+          "description": "Pull out your knife",
+          "operation": "ls",
+          "action_codes": ["53", "54"],
+          "active": false
+        },
+        {
+          "code": "51",
+          "description": "Go forward",
+          "operation": "cp",
+          "position_code": "6",
+          "active": true,
+          "visible": true
+        },
+        {
+          "code": "52",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "position_code": "4",
+          "active": true,
+          "visible": true
+        },
+        {
+          "code": "53",
+          "description": "knife out",
+          "operation": "cis",
+          "item_code": "1",
+          "value": "in hand",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "54",
+          "description": "desc",
+          "operation": "cpd",
+          "position_description": "You pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually the flee from the light into cracks in the walls.",
+          "active": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "code": "6",
+      "description": "After the long, wet corridor you arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut.",
+      "items": [
+        {
+          "code": "3",
+          "name": "ork",
+          "description": "a disgusting ork",
+          "state": "alive"
+        }
+      ],
+      "available_actions": [
+        {
+          "code": "60",
+          "description": "Make your move",
+          "operation": "ran",
+          "action_codes": ["41", "42"],
+          "active": true
+        },
+        {
+          "code": "61",
+          "description": "lucky end",
+          "operation": "cp",
+          "position_code": "-4",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "62",
+          "description": "unlucky end",
+          "operation": "cp",
+          "position_code": "-3",
+          "active": true,
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "601",
+          "description": "",
+          "operation": "con",
+          "conditions": [{ "item_code": "1", "state": "in hand" }],
+          "action_codes": ["60", "61"],
           "active": true
         }
       ]

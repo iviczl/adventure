@@ -33,7 +33,7 @@ def get_action_from_position_list(positions: list, action_code: str):
         action = get_action_from_position(position, action_code)
         if action:
             return action
-    
+
 def get_action_from_position(position, action_code: str):
     action = next((a for a in position.available_actions if a.code == action_code), None)
     if action == None:
@@ -42,19 +42,46 @@ def get_action_from_position(position, action_code: str):
         action = next((a for a in position.leaving_actions if a.code == action_code), None)
 
     return action
-    
-def get_item(adventure, action_code: str):
-    item = next((i for i in adventure.actual_position.items if i.code == action_code), None)
-    if item == None:
-        item = next((i for i in adventure.player.items if i.code == action_code), None)
+
+def get_item_from_player(player, item_code):
+    return next((i for i in player.items if i.code == item_code), None)
+
+def get_item_from_positions(positions, item_code):
+    for position in positions:
+        item = get_item_from_position(position, item_code)
+        if item:
+            return item
+
+def pop_item_from_list(items, item_code):
+    for i in range(len(items)):
+        if items[i].code == item_code:
+            return items.pop(i)
+
+def get_item_from_position(position, item_code):
+    return next((i for i in position.items if i.code == item_code), None)
+
+def get_item(adventure, item_code: str):
+    item = get_item_from_position(adventure.actual_position, item_code)
+    if not item:
+        item = get_item_from_player(adventure.player, item_code)
 
     return item
 
+def prepare_actions(actions):
+    return stringify_action_codes(stringify_action_functions(actions))
+
 def stringify_action_functions(actions):
     for action in actions:
-        if action["function"] != None:
+        if "function" in action and action["function"]:
             action["function"] = json.dumps(action["function"])
     return actions
+
+def stringify_action_codes(actions):
+    for action in actions:
+        if "action_codes" in action and action["action_codes"]:
+            action["action_codes"] = json.dumps(action["action_codes"])
+    return actions
+
 
 def change_dict_keys(dictionary: dict, changeable: dict):
     for key in changeable.keys():

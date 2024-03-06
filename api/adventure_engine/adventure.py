@@ -54,8 +54,7 @@ class Adventure(db.Model):
         if "items" in data["player"]:
             # adventure.player.items = list(map(lambda i: Item(**i), prepare_items(data["player"]["items"])))
             adventure.player.items = list(map(lambda i: Item(**i), data["player"]["items"]))
-        # adventure.available_actions = list(map(lambda a: Action(**a), prepare_actions(data["available_actions"])))
-        adventure.available_actions = list(map(lambda a: Action(**a), stringify_action_functions(data["available_actions"])))
+        adventure.available_actions = list(map(lambda a: Action(**a), prepare_actions(data["available_actions"])))
 
         for position_data in data["positions"]:
             position = Position()
@@ -63,17 +62,13 @@ class Adventure(db.Model):
             position.description = position_data["description"]
             adventure.positions.append(position)
             if "items" in position_data:
-                # position.items = list(map(lambda i: Item(**i), prepare_items(position_data["items"])))
                 position.items = list(map(lambda i: Item(**i), position_data["items"]))
             if "available_actions" in position_data:
-                # position.available_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["available_actions"])))
-                position.available_actions = list(map(lambda a: Action(**a), stringify_action_functions(position_data["available_actions"])))
+                position.available_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["available_actions"])))
             if "entering_actions" in position_data:
-                # position.entering_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["entering_actions"])))
-                position.entering_actions = list(map(lambda a: Action(**a), stringify_action_functions(position_data["entering_actions"])))
+                position.entering_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["entering_actions"])))
             if "leaving_actions" in position_data:
-                # position.leaving_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["leaving_actions"])))
-                position.leaving_actions = list(map(lambda a: Action(**a), stringify_action_functions(position_data["leaving_actions"])))
+                position.leaving_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["leaving_actions"])))
 
 
         adventure.actual_position = get_position_from_position_list(adventure.positions, "0")

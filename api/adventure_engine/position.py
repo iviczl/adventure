@@ -9,7 +9,7 @@ from config import db
 class Position(db.Model):
     id = db.Column(db.Integer(), primary_key = True, autoincrement = True)
     code = db.Column(db.String(10), unique = False, nullable = False)
-    description = db.Column(db.String(100), unique = False, nullable = False)
+    description = db.Column(db.String(500), unique = False, nullable = False)
     visited: Mapped[bool] = mapped_column(default= False)
     available_actions: Mapped[List["Action"]] = relationship(foreign_keys="[Action.available_actions_position_id]")
     entering_actions: Mapped[List["Action"]] = relationship(foreign_keys="[Action.entering_actions_position_id]")
@@ -23,8 +23,8 @@ class Position(db.Model):
             # "id": self.id, 
             "code": self.code,
             "description": self.description,
-            "available_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active, self.available_actions))), # should not return with inactive actions
-            "entering_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active, self.entering_actions))),
-            "leaving_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active, self.leaving_actions))),
+            "available_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.available_actions))), # should not return with inactive or not visible actions
+            "entering_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.entering_actions))),
+            "leaving_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.leaving_actions))),
             "items":list(map(lambda i: i.get_serializable(), self.items))
         }
