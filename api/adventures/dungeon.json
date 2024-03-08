@@ -291,7 +291,7 @@
     },
     {
       "code": "-3",
-      "description": "You turn around on your heel quickly, but somewhat late. You sense as two sharp object deepens in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
+      "description": "You turn around on your heel quickly, but somewhat late. You sense as something sharp sinks in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
       "available_actions": []
     },
     {
@@ -307,24 +307,20 @@
           "code": "50",
           "description": "Pull out your knife",
           "operation": "ls",
-          "action_codes": ["53", "54"],
+          "action_codes": ["53", "54", "55"],
           "active": false
         },
         {
           "code": "51",
           "description": "Go forward",
           "operation": "cp",
-          "position_code": "6",
-          "active": true,
-          "visible": true
+          "position_code": "6"
         },
         {
           "code": "52",
           "description": "Go back to the junction",
           "operation": "cp",
-          "position_code": "4",
-          "active": true,
-          "visible": true
+          "position_code": "2"
         },
         {
           "code": "53",
@@ -338,16 +334,49 @@
         {
           "code": "54",
           "description": "desc",
-          "operation": "cpd",
-          "position_description": "You pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually the flee from the light into cracks in the walls.",
+          "operation": "aptd",
+          "position_description": "You are in a long, wet corridor and pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually they flee from the light into cracks in the walls.",
           "active": true,
           "visible": false
+        },
+        {
+          "code": "55",
+          "description": "inactivate 50",
+          "operation": "caa",
+          "action_code": "50",
+          "action_active": false,
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "56",
+          "description": "activate 50",
+          "operation": "caa",
+          "action_code": "50",
+          "action_active": true,
+          "active": true,
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "301",
+          "description": "has the knife",
+          "operation": "con",
+          "function": {
+            "conditions": [
+              { "player_must_have": true, "item_code": "1" },
+              { "item_code": "1", "state": "in bag" }
+            ],
+            "action_codes": ["56"]
+          },
+          "active": true
         }
       ]
     },
     {
       "code": "6",
-      "description": "After the long, wet corridor you arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut.",
+      "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut. From behind the hut waves' noise can be heard faintly.",
       "items": [
         {
           "code": "3",
@@ -359,24 +388,48 @@
       "available_actions": [
         {
           "code": "60",
-          "description": "Make your move",
-          "operation": "ran",
-          "action_codes": ["41", "42"],
+          "description": "Go to the water",
+          "operation": "cp",
+          "position_code": "7",
           "active": true
         },
         {
           "code": "61",
-          "description": "lucky end",
+          "description": "Go to the corridor",
           "operation": "cp",
-          "position_code": "-4",
+          "position_code": "5",
+          "active": true
+        },
+        {
+          "code": "62",
+          "description": "dead ork",
+          "operation": "aptd",
+          "position_description": "There is a dead ork on the ground.",
           "active": true,
           "visible": false
         },
         {
-          "code": "62",
-          "description": "unlucky end",
+          "code": "63",
+          "description": "dead by ork",
           "operation": "cp",
-          "position_code": "-3",
+          "position_code": "-5",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "64",
+          "description": "fight text",
+          "operation": "aptd",
+          "position_description": "You hear a sudden noise behind and spin around the knife instintively hold in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "65",
+          "description": "kill ork",
+          "operation": "cis",
+          "item_code": "3",
+          "value": "dead",
           "active": true,
           "visible": false
         }
@@ -386,11 +439,292 @@
           "code": "601",
           "description": "",
           "operation": "con",
-          "conditions": [{ "item_code": "1", "state": "in hand" }],
-          "action_codes": ["60", "61"],
+          "function": {
+            "conditions": [{ "item_code": "3", "state": "dead" }],
+            "action_codes": ["62"]
+          },
+          "active": true
+        },
+        {
+          "code": "602",
+          "description": "",
+          "operation": "con",
+          "function": {
+            "conditions": [
+              { "item_code": "3", "state": "alive" },
+              { "item_code": "1", "state": "in hand" }
+            ],
+            "action_codes": ["64", "65"]
+          },
+          "active": true
+        },
+        {
+          "code": "603",
+          "description": "",
+          "operation": "con",
+          "function": {
+            "conditions": [
+              { "item_code": "3", "state": "alive" },
+              { "item_code": "1", "state": "in bag" }
+            ],
+            "action_codes": ["63"]
+          },
           "active": true
         }
       ]
+    },
+    {
+      "code": "-5",
+      "description": "You hear a sudden noise behind and spin around. A wooden object crushed into your forehead. You hear that an ork yells hilariously and you lose consciousness. Your adventure ended.",
+      "available_actions": []
+    },
+    {
+      "code": "7",
+      "description": "You go over the hut and see that the cavern here becomes even wider and the ground drops a few feet. There is an underground lake in front of you with black, cold water. Waves roll lazily on the shore but you cannot see anything interesting. The ork obviously had not have a boat and the water is not inviting at all, so you do not want to go in. The lake is huge and reaches the walls of the cavern every other side. It is a dead end.",
+      "items": [
+        {
+          "code": "2",
+          "name": "key",
+          "description": "a rusty key",
+          "state": "in bag"
+        }
+      ],
+      "available_actions": [
+        {
+          "code": "70",
+          "description": "Go back to the hut",
+          "operation": "cp",
+          "position_code": "6",
+          "active": true
+        },
+        {
+          "code": "71",
+          "description": "Look around the lake shore",
+          "operation": "ls",
+          "action_codes": ["72", "73", "74"]
+        },
+        {
+          "code": "72",
+          "description": "found key text",
+          "operation": "cptd",
+          "position_description": "As you stroll around, you accidentally kick a metallic object on the ground. You pick it up and you see it is a rusty iron key. You think, it must be good for something and put it in you bag.",
+          "visible": false
+        },
+        {
+          "code": "73",
+          "description": "put key in bag",
+          "operation": "pui",
+          "item_code": "2",
+          "visible": false
+        },
+        {
+          "code": "74",
+          "description": "inactivate 71",
+          "operation": "caa",
+          "action_code": "71",
+          "action_active": false,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "code": "8",
+      "description": "From the junction the way turns right then left and right again. After a short while you arrive at a rusty iron door that blocks your way. The door looks old but massive, so you will not consider to break it with a kick. It has a keyhole and an also rusty handle above it.",
+      "items": [
+        {
+          "code": "4",
+          "name": "door",
+          "description": "rusty iron door",
+          "state": "locked"
+        }
+      ],
+      "available_actions": [
+        {
+          "code": "80",
+          "description": "Put the iron key in the keyhole and turn it.",
+          "operation": "ls",
+          "action_codes": ["81", "82", "83", "87"],
+          "active": false
+        },
+        {
+          "code": "81",
+          "description": "unlock door",
+          "operation": "cis",
+          "item_code": "4",
+          "value": "unlocked",
+          "visible": false
+        },
+        {
+          "code": "82",
+          "description": "inactivate 80",
+          "operation": "caa",
+          "action_code": "80",
+          "action_active": false,
+          "visible": false
+        },
+        {
+          "code": "83",
+          "description": "activate 84",
+          "operation": "caa",
+          "action_code": "84",
+          "action_active": true,
+          "visible": false
+        },
+        {
+          "code": "84",
+          "description": "Go through the door",
+          "operation": "cp",
+          "position_code": "9",
+          "active": false
+        },
+        {
+          "code": "85",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "position_code": "2"
+        },
+        {
+          "code": "86",
+          "description": "activate 80",
+          "operation": "caa",
+          "action_code": "80",
+          "action_active": true,
+          "visible": false
+        },
+        {
+          "code": "87",
+          "description": "open door text",
+          "operation": "aptd",
+          "position_description": "You unlocked the door and it is open now.",
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "801",
+          "description": "has key, door locked",
+          "operation": "con",
+          "function": {
+            "conditions": [
+              { "player_must_have": true, "item_code": "2" },
+              { "item_code": "4", "state": "locked" }
+            ],
+            "action_codes": ["86"]
+          }
+        },
+        {
+          "code": "802",
+          "description": "door open",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "item_code": "4", "state": "open" }],
+            "action_codes": ["87"]
+          }
+        }
+      ]
+    },
+    {
+      "code": "9",
+      "description": "You arrived in a chamber that has an elegant feel to it. There is a bit of dust, but there are elaborate embellishments on the wall and even on the ceiling and there are two big chests at the furthest two corners of the chamber. One seems to be a perfectly new copper chest and the other is a dusty, old wooden one. There are also two more ways out of the chamber: one narrow and one wider.",
+      "items": [
+        {
+          "code": "5",
+          "name": "wooden chest",
+          "description": "dusty, old wooden chest",
+          "state": "closed"
+        },
+        {
+          "code": "6",
+          "name": "vial",
+          "description": "life essence vial",
+          "state": ""
+        }
+      ],
+      "available_actions": [
+        {
+          "code": "90",
+          "description": "Inspect the wooden chest",
+          "operation": "ls",
+          "action_codes": ["91", "92", "93", "94"]
+        },
+        {
+          "code": "91",
+          "description": "open chest",
+          "operation": "cis",
+          "item_code": "5",
+          "value": "open",
+          "visible": false
+        },
+        {
+          "code": "92",
+          "description": "pick up vial",
+          "operation": "pui",
+          "item_code": "6",
+          "visible": false
+        },
+        {
+          "code": "93",
+          "description": "inactivate 90",
+          "operation": "caa",
+          "action_code": "90",
+          "action_active": false,
+          "visible": false
+        },
+        {
+          "code": "94",
+          "description": "chest open text",
+          "operation": "cptd",
+          "position_description": "The wooden chest has no lock on it and opens easily, though its hinges are a bit squeeky. On the bottom of the chest there is a small vial that has some faintly glowing bluish liquid in it. There is a time yellowed label on its side that says \"Life Essence\". You heart skips a beat because you know, you have just got the greatest gift from the god of chaos. If you can get out alive, you just need to drink it and your life will be lengthened by a hundred years at least. Carefully cover the vial in your handkerchief and put it in your inner pocket of your jacket.",
+          "visible": false
+        },
+        {
+          "code": "95",
+          "description": "Inspect the copper chest",
+          "operation": "cp",
+          "position_code": "-7"
+        },
+        {
+          "code": "96",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "position_code": "2"
+        },
+        {
+          "code": "97",
+          "description": "Go through the wide door",
+          "operation": "cptd",
+          "position_description": "You go in a wide route that slowly goes upward. You feel this is it: you will get out in no time and... except as the route elevates, the ceiling comes closer and closer. First you need to bend a bit but soon you should go on your knees. You toss your torch in front of you and see that the route is even narrower further. You need to go back to the chest chamber."
+        },
+        {
+          "code": "98",
+          "description": "Go through the narrow door",
+          "operation": "cp",
+          "position_code": "10"
+        },
+        {
+          "code": "99",
+          "description": "chest already open text",
+          "operation": "aptd",
+          "position_description": "The wooden chest is already wide open and seems to be empty.",
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "801",
+          "description": "chest open",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "item_code": "5", "state": "open" }],
+            "action_codes": ["99"]
+          }
+        }
+      ]
+    },
+    {
+      "code": "-7",
+      "description": "You open the lid of the copper chest and as it was assumable it opens very easily. You lean over the rim to see what is inside. But in a moment the chest grows teeth and the lid grabs you neck. It is a mimic! You try to break free but to no avail. The mimic adjusts your body so you are already half way in its mouth. You cannot escape and slowly slip into it. Your adventure ends here.",
+      "available_actions": []
     }
   ]
 }

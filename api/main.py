@@ -83,17 +83,20 @@ def do():
     has_rights, response, values = _authenticate(["actionId"])
     if not has_rights:
         return response
+    
+    response_data = None
     try:
         adventure = Adventure.query.get(values[ADVENTURE])
         print("OLD POSITION",adventure.actual_position.code)
         print("ACTION TO EXECUTE",values["actionId"])
         adventure.do(values["actionId"])
+        response_data = adventure.actual_position.get_serializable()
         db.session.commit()
         print("POSITION",adventure.actual_position.code)
     except Exception as e:
         return jsonify({ "message": str(e)}), 400
 
-    response =  make_response(adventure.actual_position.get_serializable())
+    response =  make_response(response_data)
     return response
 
 @app.route("/quit", methods =["DELETE"])

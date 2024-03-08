@@ -12,6 +12,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class Operation(StrEnum):
    CHANGE_POSITION = "cp"
    CHANGE_POSITION_DESCRIPTION = "cpd"
+   CHANGE_POSITION_TEMPORARY_DESCRIPTION = "cptd"
+   APPEND_POSITION_TEMPORARY_DESCRIPTION = "aptd"
    CHANGE_POSITION_VISITED = "cpv"
    CHANGE_ACTION_ACTIVE = "caa"
    CHANGE_ACTION_VISIBLE = "cav"
@@ -140,6 +142,18 @@ class Action(db.Model):
                 else:
                     position = adventure.actual_position
                 position.description = action.position_description
+            case Operation.CHANGE_POSITION_TEMPORARY_DESCRIPTION:
+                if action.position_code:
+                    position = get_position_from_position_list(adventure.positions, action.position_code)
+                else:
+                    position = adventure.actual_position
+                position.temporary_description = action.position_description
+            case Operation.APPEND_POSITION_TEMPORARY_DESCRIPTION:
+                if action.position_code:
+                    position = get_position_from_position_list(adventure.positions, action.position_code)
+                else:
+                    position = adventure.actual_position
+                position.temporary_description = position.description + " " + action.position_description
             case Operation.CHANGE_POSITION_VISITED:
                 if action.position_code:
                     position = get_position_from_position_list(adventure.positions, action.position_code)
@@ -212,10 +226,19 @@ class Action(db.Model):
 
                     if not conditions_met:
                         break
-                else:
+
+                if conditions_met:
                     for action_code in function["action_codes"]:
                         executable = Action._find_action(adventure, action_code)
                         Action.execute(executable, adventure)
+                else:
+                    if not "else_action_codes" in function:
+                        return
+                    
+                    for action_code in function["else_action_codes"]:
+                        executable = Action._find_action(adventure, action_code)
+                        Action.execute(executable, adventure)
+
             case Operation.LIST:
                 action_codes = loads(action.action_codes)
                 for action_code in action_codes:

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, event
 from adventure_engine.action import Action
 from adventure_engine.item import Item
 from sqlalchemy.orm import Mapped, relationship, mapped_column
@@ -18,13 +18,20 @@ class Position(db.Model):
     adventure_id: Mapped[int] = mapped_column(ForeignKey("adventure.id"))
     actual_position_adventure_id: Mapped[Optional[int]] = mapped_column(ForeignKey("adventure.id"))
 
+    def __init__(self) -> None:
+        self.temporary_description: str = ""
+
     def get_serializable(self):
         return {
             # "id": self.id, 
             "code": self.code,
-            "description": self.description,
+            "description": self.temporary_description if self.temporary_description else self.description,
             "available_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.available_actions))), # should not return with inactive or not visible actions
-            "entering_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.entering_actions))),
-            "leaving_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.leaving_actions))),
+            # "entering_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.entering_actions))),
+            # "leaving_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.leaving_actions))),
             "items":list(map(lambda i: i.get_serializable(), self.items))
         }
+
+@event.listens_for(Position, "load")
+def receive_load(target, context):
+    target.temporary_description = ""
