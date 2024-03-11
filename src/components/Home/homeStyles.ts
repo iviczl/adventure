@@ -16,7 +16,7 @@ export const Description = styled.div`
 export const StartGrid = styled.section`
   margin: 1rem 0 0 0;
   display: grid;
-  grid-template-columns: clamp(10rem, 15rem, 30rem) clamp(3rem, 5rem, 10rem);
+  // grid-template-columns: repeat(auto-fit, clamp(10rem, 15rem, 30rem));
   gap: 1rem;
-  max-width: 100%;
+  // max-width: 100%;
 `

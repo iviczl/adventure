@@ -26,6 +26,11 @@
       "available_actions": []
     },
     {
+      "code": "-8",
+      "description": "You came out of the dungeon alive and you have the vial of most importance in your pocket. The sunshine seems to smile on you and you cannot help yourself and smile back. You know well that a very long and happy life awaits you.",
+      "entering_actions": []
+    },
+    {
       "code": "0",
       "description": "You come clear of the forest to a clearing and now you are standing in front of a tiny but dangerous dungeon. What will you do?",
       "available_actions": [
@@ -46,6 +51,24 @@
           "item_code": "",
           "function": null,
           "active": true
+        },
+        {
+          "code": "02",
+          "description": "success",
+          "operation": "cp",
+          "position_code": "-8",
+          "visible": false
+        }
+      ],
+      "entering_actions": [
+        {
+          "code": "01",
+          "description": "has vial",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "player_must_have": true, "item_code": "6" }],
+            "action_codes": ["02"]
+          }
         }
       ]
     },
@@ -105,7 +128,7 @@
       ],
       "entering_actions": [
         {
-          "code": "101",
+          "code": "16",
           "description": "",
           "operation": "con",
           "position_code": "",
@@ -232,8 +255,8 @@
         {
           "code": "34",
           "description": "pick up knife desc",
-          "operation": "cpd",
-          "position_description": "As you pick up the rag you realise that it is heavier than you thought. You unwrap it and find a knife with a nice handle in it. It has comfortable grip so you think it must be good practically too. You put it in your bag.",
+          "operation": "cptd",
+          "position_description": "As you pick up the rag you realise that it is heavier than you thought. You unwrap it and inside you find a knife with a nice handle. It has comfortable grip so you think it must be good practically too. You put it in your bag.",
           "active": true,
           "visible": false
         },
@@ -420,7 +443,7 @@
           "code": "64",
           "description": "fight text",
           "operation": "aptd",
-          "position_description": "You hear a sudden noise behind and spin around the knife instintively hold in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "position_description": "You hear a sudden noise behind and spin around the knife instinctively hold in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
           "active": true,
           "visible": false
         },
@@ -438,37 +461,27 @@
         {
           "code": "601",
           "description": "",
-          "operation": "con",
-          "function": {
-            "conditions": [{ "item_code": "3", "state": "dead" }],
-            "action_codes": ["62"]
-          },
-          "active": true
-        },
-        {
-          "code": "602",
-          "description": "",
-          "operation": "con",
-          "function": {
-            "conditions": [
-              { "item_code": "3", "state": "alive" },
-              { "item_code": "1", "state": "in hand" }
-            ],
-            "action_codes": ["64", "65"]
-          },
-          "active": true
-        },
-        {
-          "code": "603",
-          "description": "",
-          "operation": "con",
-          "function": {
-            "conditions": [
-              { "item_code": "3", "state": "alive" },
-              { "item_code": "1", "state": "in bag" }
-            ],
-            "action_codes": ["63"]
-          },
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "item_code": "3", "state": "dead" }],
+              "action_codes": ["62"]
+            },
+            {
+              "conditions": [
+                { "item_code": "3", "state": "alive" },
+                { "item_code": "1", "state": "in hand" }
+              ],
+              "action_codes": ["64", "65"]
+            },
+            {
+              "conditions": [
+                { "item_code": "3", "state": "alive" },
+                { "item_code": "1", "state": "in bag" }
+              ],
+              "action_codes": ["63"]
+            }
+          ],
           "active": true
         }
       ]
@@ -594,7 +607,7 @@
         {
           "code": "87",
           "description": "open door text",
-          "operation": "aptd",
+          "operation": "cptd",
           "position_description": "You unlocked the door and it is open now.",
           "visible": false
         }
@@ -602,24 +615,21 @@
       "entering_actions": [
         {
           "code": "801",
-          "description": "has key, door locked",
-          "operation": "con",
-          "function": {
-            "conditions": [
-              { "player_must_have": true, "item_code": "2" },
-              { "item_code": "4", "state": "locked" }
-            ],
-            "action_codes": ["86"]
-          }
-        },
-        {
-          "code": "802",
-          "description": "door open",
-          "operation": "con",
-          "function": {
-            "conditions": [{ "item_code": "4", "state": "open" }],
-            "action_codes": ["87"]
-          }
+          "description": "has key, door open/locked",
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "item_code": "4", "state": "open" }],
+              "action_codes": ["87"]
+            },
+            {
+              "conditions": [
+                { "player_must_have": true, "item_code": "2" },
+                { "item_code": "4", "state": "locked" }
+              ],
+              "action_codes": ["86"]
+            }
+          ]
         }
       ]
     },
@@ -711,7 +721,7 @@
       ],
       "entering_actions": [
         {
-          "code": "801",
+          "code": "901",
           "description": "chest open",
           "operation": "con",
           "function": {
@@ -725,6 +735,24 @@
       "code": "-7",
       "description": "You open the lid of the copper chest and as it was assumable it opens very easily. You lean over the rim to see what is inside. But in a moment the chest grows teeth and the lid grabs you neck. It is a mimic! You try to break free but to no avail. The mimic adjusts your body so you are already half way in its mouth. You cannot escape and slowly slip into it. Your adventure ends here.",
       "available_actions": []
+    },
+    {
+      "code": "10",
+      "description": "You are in a narrow route. In one direction there is an entrance to a chamber with an elegant doorway, in the other there is a steep slope upward.",
+      "available_actions": [
+        {
+          "code": "101",
+          "description": "Go towards the slope",
+          "operation": "cp",
+          "position_code": "1"
+        },
+        {
+          "code": "102",
+          "description": "Go towards the chamber",
+          "operation": "cp",
+          "position_code": "9"
+        }
+      ]
     }
   ]
 }

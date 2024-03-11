@@ -6,7 +6,7 @@ from random import choice
 from sqlalchemy import ForeignKey
 from config import db
 from adventure_engine.adventure_helper import get_item, get_item_from_player, get_item_from_position, pop_item_from_list, get_position_from_position_list, get_action
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Operation(StrEnum):
@@ -24,7 +24,8 @@ class Operation(StrEnum):
    PUT_DOWN_ITEM = "pdi"
    MOVE_ITEM = "moi"
    ERASE_ITEM = "eri"
-   CONDITIONAL = "con"
+   CONDITIONAL = "con" # conditional action execution
+   SWITCH_CONDITIONAL = "scon" # first matching conditional action execution
    LIST = "ls"
    RANDOM = "ran"
   #  CHANGE_ADVENTURE_STATE = "cas"
@@ -44,28 +45,18 @@ class Action(db.Model):
     action_active = db.Column(db.Boolean, default = True, nullable = True )
     value = db.Column(db.String(40), unique = False, nullable = True)
     function = db.Column(db.String(500), unique = False, nullable = True)
+    functions = db.Column(db.String(1000), unique = False, nullable = True)
     active = db.Column(db.Boolean, default = True, nullable = False )
     visible = db.Column(db.Boolean, default = True, nullable = False )
     available_actions_position_id: Mapped[Optional[int]] = mapped_column(ForeignKey("position.id"))
     entering_actions_position_id: Mapped[Optional[int]] = mapped_column(ForeignKey("position.id"))
     leaving_actions_position_id: Mapped[Optional[int]] = mapped_column(ForeignKey("position.id"))
-    # available_actions_position: Mapped[Optional["Position"]] = relationship("Position", back_populates= "available_actions")
-    # entering_actions_position: Mapped[Optional["Position"]] = relationship("Position", back_populates= "entering_actions")
-    # leaving_actions_position: Mapped[Optional["Position"]] = relationship("Position", back_populates= "leaving_actions")
-    # available_actions_adventure_id: Mapped[Optional[int]] = mapped_column(ForeignKey("adventure.id"))
     available_actions_adventure_id: Mapped[Optional[int]] = mapped_column(ForeignKey("adventure.id"))
 
     def get_serializable(self):
         return { 
-            # "id": self.id, 
             "code": self.code,
             "description": self.description,
-            # "operation": str(self.operation),
-            # "position_code": self.position_code,
-            # "value": self.value,
-            # "item_code": self.item_code,
-            # "function": self.function,
-            # "active": self.active
         }
 
     @staticmethod
@@ -112,13 +103,60 @@ class Action(db.Model):
     def _change_item_description(adventure, item_code: str, value: str):
         item = Action._find_item(adventure,item_code)
         item.description = value
-        # Action._execute_entering_actions(adventure)
 
     @staticmethod
     def _change_item_state(adventure, item_code: str, value: str):
         item = Action._find_item(adventure,item_code)
         item.state = value
-        # Action._execute_entering_actions(adventure)
+
+    @staticmethod
+    def _conditional(function, adventure):
+        conditions_met = True
+        for condition in function["conditions"]:
+            if "player_must_have" in condition:
+                must_have = condition["player_must_have"]
+                if not "item_code" in condition:
+                    raise ValueError(f"Missing item code.")
+                has_item = bool(get_item_from_player(adventure.player, condition["item_code"]))
+                conditions_met = conditions_met and not(must_have ^ has_item)
+            elif "position_must_have" in condition:
+                print("POSITION_MUST_HAVE")
+                must_have = condition["position_must_have"] == "true"
+                if not "position_code" in condition:
+                    raise ValueError(f"Missing position code.")
+                position = get_position_from_position_list(adventure.positions, condition["position_code"])
+                if not "item_code" in condition:
+                    raise ValueError(f"Missing item code.")
+                has_item = bool(get_item_from_position(position, condition["item_code"]))
+                conditions_met = conditions_met and not(must_have ^ has_item)
+            elif "item_code" in condition:
+                print("ITEM_CODE")
+                item = get_item(adventure, condition["item_code"] )
+                if not item:
+                    raise ValueError(f"Not existing item {condition["item_code"]}.")
+                if "name" in condition:
+                    conditions_met = conditions_met and item.name == condition["name"]
+                elif "state" in condition:
+                    conditions_met = conditions_met and item.state == condition["state"]
+            else:
+                print("NOTHING")
+
+            if not conditions_met:
+                break
+
+        if conditions_met:
+            for action_code in function["action_codes"]:
+                executable = Action._find_action(adventure, action_code)
+                Action.execute(executable, adventure)
+        else:
+            if not "else_action_codes" in function:
+                return
+            
+            for action_code in function["else_action_codes"]:
+                executable = Action._find_action(adventure, action_code)
+                Action.execute(executable, adventure)
+
+        return conditions_met
 
     @staticmethod
     def execute(action, adventure):
@@ -191,54 +229,14 @@ class Action(db.Model):
                 if not item:
                     raise ValueError(f"There is no such item at the actual position: {adventure.actual_position.code}:{action.item_code}")
             case Operation.CONDITIONAL:
-                print("CONDITIONAL")
-                conditions_met = True
                 function = loads(action.function)
-                # item = None
-                for condition in function["conditions"]:
-                    if "player_must_have" in condition:
-                        must_have = condition["player_must_have"]
-                        if not "item_code" in condition:
-                            raise ValueError(f"Missing item code.")
-                        has_item = bool(get_item_from_player(adventure.player, condition["item_code"]))
-                        conditions_met = conditions_met and not(must_have ^ has_item)
-                    elif "position_must_have" in condition:
-                        print("POSITION_MUST_HAVE")
-                        must_have = condition["position_must_have"] == "true"
-                        if not "position_code" in condition:
-                            raise ValueError(f"Missing position code.")
-                        position = get_position_from_position_list(adventure.positions, condition["position_code"])
-                        if not "item_code" in condition:
-                            raise ValueError(f"Missing item code.")
-                        has_item = bool(get_item_from_position(position, condition["item_code"]))
-                        conditions_met = conditions_met and not(must_have ^ has_item)
-                    elif "item_code" in condition:
-                        print("ITEM_CODE")
-                        item = get_item(adventure, condition["item_code"] )
-                        if not item:
-                            raise ValueError(f"Not existing item {condition["item_code"]}.")
-                        if "name" in condition:
-                            conditions_met = conditions_met and item.name == condition["name"]
-                        elif "state" in condition:
-                            conditions_met = conditions_met and item.state == condition["state"]
-                    else:
-                        print("NOTHING")
-
-                    if not conditions_met:
+                Action._conditional(function, adventure)
+            case Operation.SWITCH_CONDITIONAL:
+                functions = loads(action.functions)
+                for function in functions:
+                    executed = Action._conditional(function, adventure)
+                    if executed:
                         break
-
-                if conditions_met:
-                    for action_code in function["action_codes"]:
-                        executable = Action._find_action(adventure, action_code)
-                        Action.execute(executable, adventure)
-                else:
-                    if not "else_action_codes" in function:
-                        return
-                    
-                    for action_code in function["else_action_codes"]:
-                        executable = Action._find_action(adventure, action_code)
-                        Action.execute(executable, adventure)
-
             case Operation.LIST:
                 action_codes = loads(action.action_codes)
                 for action_code in action_codes:

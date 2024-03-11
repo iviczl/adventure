@@ -72,6 +72,8 @@ def prepare_actions(actions):
 
 def stringify_action_functions(actions):
     for action in actions:
+        if "functions" in action and action["functions"]:
+            action["functions"] = json.dumps(action["functions"])
         if "function" in action and action["function"]:
             action["function"] = json.dumps(action["function"])
     return actions
@@ -81,7 +83,6 @@ def stringify_action_codes(actions):
         if "action_codes" in action and action["action_codes"]:
             action["action_codes"] = json.dumps(action["action_codes"])
     return actions
-
 
 def change_dict_keys(dictionary: dict, changeable: dict):
     for key in changeable.keys():

@@ -1,18 +1,30 @@
 import styled, { createGlobalStyle } from 'styled-components'
 
+export const devices = {
+  mobile: `(max-width: 1023px)`,
+  desktop: `(min-width: 1024px)`,
+}
+
 const GlobalStyle = createGlobalStyle`
-font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-line-height: 1.5;
-font-weight: 400;
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  color: #331111;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: auto;
+}
 
-color: #331111;
-background-color: #242424;
-
-font-synthesis: none;
-text-rendering: optimizeLegibility;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-padding: auto;
+#root {
+  box-sizing: border-box;
+}
 `
 export default GlobalStyle
 
@@ -22,18 +34,22 @@ export const MainHeading = styled.h1`
   margin-top: 2rem;
 `
 export const MainContainer = styled.div`
+  box-sizing: inherit;
   margin: auto;
   background-color: #cc9977;
   display: flex;
   place-items: center;
   flex-flow: column;
   min-width: 320px;
-  height: 90vh;
+  max-width: 600px;
+  height: 100%;
+  max-height: 100%
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
   padding: 1rem;
 `
 export const Container = styled.div`
+  box-sizing: inherit;
   margin-left: auto;
   margin-right: auto;
   padding: 3rem;
