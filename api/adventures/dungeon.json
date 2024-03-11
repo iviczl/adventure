@@ -444,7 +444,7 @@
           "code": "64",
           "description": "fight text",
           "operation": "aptd",
-          "position_description": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "position_description": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
           "active": true,
           "visible": false
         },
