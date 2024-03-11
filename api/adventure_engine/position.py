@@ -11,6 +11,7 @@ class Position(db.Model):
     code = db.Column(db.String(10), unique = False, nullable = False)
     description = db.Column(db.String(500), unique = False, nullable = False)
     visited: Mapped[bool] = mapped_column(default= False)
+    end_position: Mapped[bool] = mapped_column(default= False)
     available_actions: Mapped[List["Action"]] = relationship(foreign_keys="[Action.available_actions_position_id]")
     entering_actions: Mapped[List["Action"]] = relationship(foreign_keys="[Action.entering_actions_position_id]")
     leaving_actions: Mapped[List["Action"]] = relationship(foreign_keys="[Action.leaving_actions_position_id]")
@@ -27,9 +28,10 @@ class Position(db.Model):
             "code": self.code,
             "description": self.temporary_description if self.temporary_description else self.description,
             "available_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.available_actions))), # should not return with inactive or not visible actions
+            "end_position": self.end_position
             # "entering_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.entering_actions))),
             # "leaving_actions": list(map(lambda a: a.get_serializable(), filter(lambda action: action.active and action.visible, self.leaving_actions))),
-            "items":list(map(lambda i: i.get_serializable(), self.items))
+            # "items":list(map(lambda i: i.get_serializable(), self.items))
         }
 
 @event.listens_for(Position, "load")

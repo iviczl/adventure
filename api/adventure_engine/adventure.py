@@ -1,20 +1,13 @@
 from typing import List, Optional
 
-from sqlalchemy import ForeignKey, Integer
 from adventure_engine.action import Action
+from adventure_engine.adventure_phase import AdventurePhase
 from adventure_engine.item import Item
 from adventure_engine.player import Player
 from adventure_engine.position import Position
 from adventure_engine.adventure_helper import *
-from enum import IntEnum
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.orm import Mapped, relationship
 from config import db
-
-class AdventurePhase(IntEnum):
-    NOT_LOADED = "-1"
-    LOADED = "0"
-    STARTED = "1"
-    ENDED = "2"
 
 class Adventure(db.Model):
     id = db.Column(db.Integer(), primary_key = True, autoincrement = True)
@@ -22,9 +15,8 @@ class Adventure(db.Model):
     title: str = db.Column(db.String(60), unique = False, nullable = False)
     description = db.Column(db.String(100), unique = False, nullable = False)
     player: Mapped["Player"] = relationship("Player", back_populates="adventure")
-    # position_id: Mapped[int] = mapped_column(ForeignKey("position.id"))
+    start_position_code = db.Column(db.String(10), unique = False, nullable = False)
     positions:  Mapped[List["Position"]] = relationship(foreign_keys="[Position.adventure_id]")# "Position",foreign_keys=[position_id] back_populates="positions_adventure")# overlaps="adventure", 
-    # actual_position_id: Mapped[int] = mapped_column(ForeignKey("position.id"))
     actual_position: Mapped["Position"] = relationship( foreign_keys="[Position.actual_position_adventure_id]", lazy="immediate") # , post_update= True, back_populates="actual_position_adventure", ,overlaps="adventure, positions", uselist= False
     phase: Mapped[str] = db.Column(db.String(), server_default=str(AdventurePhase.NOT_LOADED))
     available_actions: Mapped[Optional[List["Action"]]] = relationship(foreign_keys="[Action.available_actions_adventure_id]")
@@ -50,16 +42,18 @@ class Adventure(db.Model):
         adventure.player =  Player(data["player"]["name"])
         adventure.title = data["title"]
         adventure.description = data["description"]
-        adventure.phase = AdventurePhase.LOADED
         if "items" in data["player"]:
             # adventure.player.items = list(map(lambda i: Item(**i), prepare_items(data["player"]["items"])))
             adventure.player.items = list(map(lambda i: Item(**i), data["player"]["items"]))
+        adventure.start_position_code = data["start_position_code"]
         adventure.available_actions = list(map(lambda a: Action(**a), prepare_actions(data["available_actions"])))
 
         for position_data in data["positions"]:
             position = Position()
             position.code = position_data["code"]
             position.description = position_data["description"]
+            if "end_position" in position_data:
+                position.end_position = position_data["end_position"]
             adventure.positions.append(position)
             if "items" in position_data:
                 position.items = list(map(lambda i: Item(**i), position_data["items"]))
@@ -71,7 +65,9 @@ class Adventure(db.Model):
                 position.leaving_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["leaving_actions"])))
 
 
-        adventure.actual_position = get_position_from_position_list(adventure.positions, "0")
+        adventure.actual_position = get_position_from_position_list(adventure.positions, adventure.start_position_code)
+        adventure.actual_position.visited = True
+        adventure.phase = AdventurePhase.STARTED
         return adventure
 
     @staticmethod

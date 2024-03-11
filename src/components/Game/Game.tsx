@@ -16,6 +16,13 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
     setRequestProcessing(false)
   }
 
+  function home() {
+    state.value = {
+      ...state.value,
+      selectedGameId: '',
+    }
+  }
+
   if (!state.value.selectedGameId) {
     return null
   }
@@ -33,6 +40,11 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
             {a.description}
           </Item>
         ))}
+        {!position.end_position || (
+          <Item onClick={home} disabled={requestProcessing}>
+            Home
+          </Item>
+        )}
       </section>
       {/* <section>
         {position.items.map((i) => (

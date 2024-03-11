@@ -1,7 +1,7 @@
 {
   "code": "dungeon",
   "title": "Dungeon Mission",
-  "description": "Your task is to clear out a dangerous dungeon.",
+  "description": "Your task is to clear out a dangerous dungeon. (This is a test mission to try out the capabilities of the adventure engine, so it is a small one.)",
   "player": {
     "name": "",
     "items": [
@@ -13,22 +13,23 @@
       }
     ]
   },
+  "start_position_code": "0",
   "available_actions": [],
   "positions": [
     {
       "code": "-1",
       "description": "Your adventure is ended.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "-2",
       "description": "In the darkness you fell off a staircase and broke your neck. You are dead. Your adventure ends here.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "-8",
       "description": "You came out of the dungeon alive and you have the vial of most importance in your pocket. The sunshine seems to smile on you and you cannot help yourself and smile back. You know well that a very long and happy life awaits you.",
-      "entering_actions": []
+      "end_position": true
     },
     {
       "code": "0",
@@ -315,16 +316,16 @@
     {
       "code": "-3",
       "description": "You turn around on your heel quickly, but somewhat late. You sense as something sharp sinks in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "-4",
       "description": "Your jump on your left while turning around. As you turn you still see a big snake demon in front of you, but your left arm goes numb and you know the demon bit you. You quickly run to the entrance and hastly quit the dungeon. Your adventure ends here.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "5",
-      "description": "As you go in the route the floor and the walls become dark and moist and slippery in places. You become somewhat nervous as you can hear small noises like small legs advance carefully and sneaky.",
+      "description": "As you go in the route the floor and the walls become dark and moist and slippery in places. You are in a long, wet corridor. You become somewhat nervous as you can hear small noises like small furry legs are advancing carefully and sneakily.",
       "available_actions": [
         {
           "code": "50",
@@ -357,8 +358,8 @@
         {
           "code": "54",
           "description": "desc",
-          "operation": "aptd",
-          "position_description": "You are in a long, wet corridor and pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually they flee from the light into cracks in the walls.",
+          "operation": "cptd",
+          "position_description": "You pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually they flee from the light into cracks in the walls.",
           "active": true,
           "visible": false
         },
@@ -443,7 +444,7 @@
           "code": "64",
           "description": "fight text",
           "operation": "aptd",
-          "position_description": "You hear a sudden noise behind and spin around the knife instinctively hold in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "position_description": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is you lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
           "active": true,
           "visible": false
         },
@@ -489,11 +490,11 @@
     {
       "code": "-5",
       "description": "You hear a sudden noise behind and spin around. A wooden object crushed into your forehead. You hear that an ork yells hilariously and you lose consciousness. Your adventure ended.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "7",
-      "description": "You go over the hut and see that the cavern here becomes even wider and the ground drops a few feet. There is an underground lake in front of you with black, cold water. Waves roll lazily on the shore but you cannot see anything interesting. The ork obviously had not have a boat and the water is not inviting at all, so you do not want to go in. The lake is huge and reaches the walls of the cavern every other side. It is a dead end.",
+      "description": "You go over the hut and see that the cavern here becomes even wider and the ground drops a few feet. There is an underground lake in front of you with black, cold water. Waves roll lazily on the shore but you cannot see anything interesting. The ork obviously had not have a boat and the water is not inviting at all, so you do not want to go in. The lake is huge and reaches the walls of the cavern on every other side. It is a dead end.",
       "items": [
         {
           "code": "2",
@@ -734,7 +735,7 @@
     {
       "code": "-7",
       "description": "You open the lid of the copper chest and as it was assumable it opens very easily. You lean over the rim to see what is inside. But in a moment the chest grows teeth and the lid grabs you neck. It is a mimic! You try to break free but to no avail. The mimic adjusts your body so you are already half way in its mouth. You cannot escape and slowly slip into it. Your adventure ends here.",
-      "available_actions": []
+      "end_position": true
     },
     {
       "code": "10",

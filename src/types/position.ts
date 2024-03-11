@@ -6,4 +6,5 @@ export type Position = {
   description: string
   available_actions: Action[]
   items: Item[]
+  end_position: boolean
 }

@@ -31,7 +31,14 @@ export default GlobalStyle
 export const MainHeading = styled.h1`
   font-size: clamp(1.5rem, 6vw, 5rem);
   margin-bottom: 1rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
+`
+export const SubHeading = styled.h5`
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: 0;
+  margin-top: 0;
 `
 export const MainContainer = styled.div`
   box-sizing: inherit;
@@ -52,7 +59,7 @@ export const Container = styled.div`
   box-sizing: inherit;
   margin-left: auto;
   margin-right: auto;
-  padding: 3rem;
+  padding: 2rem;
   display: flex;
   flex-flow: column;
   place-items: center;
@@ -108,24 +115,27 @@ export const Label = styled.label`
 `
 export const Option = styled.option`
   padding: 0.6rem 0.6rem 0.6rem 0.6rem;
-  font-size: 1rem;
+  font-size: inherit;
   font-weight: 500;
   font-family: inherit;
   background-color: white;
   color: #331111;
+  height: 3rem;
 `
 export const Select = styled.select`
   border-radius: 8px;
   margin-left: ${(props) => props.$marginLeft || '1rem'};
   padding: 0.6rem .6rem .6rem .6rem;
-  font-size: 1rem;
+  font-size: inherit;
   font-weight: 500;
   font-family: inherit;
   background-color: white;
   color: #331111;
   border: solid 1px #331111;
+  height: 3rem;
   max-width: 12rem;
   width: ${(props) => props.$width || 'unset'};
+  // appearance: none;
 
   cursor: pointer;
   transition: border-color 0.25s;
@@ -154,6 +164,7 @@ export const Input = styled.input`
   border: solid 1px #331111;
   max-width: 12rem;
   width: ${(props) => props.$width || 'unset'};
+  height: 3rem;
 
   cursor: pointer;
   transition: border-color 0.25s;

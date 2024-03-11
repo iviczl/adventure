@@ -4,6 +4,7 @@ from typing import Optional
 from random import choice
 
 from sqlalchemy import ForeignKey
+from adventure_engine.adventure_phase import AdventurePhase
 from config import db
 from adventure_engine.adventure_helper import get_item, get_item_from_player, get_item_from_position, pop_item_from_list, get_position_from_position_list, get_action
 from sqlalchemy.orm import Mapped, mapped_column
@@ -77,19 +78,19 @@ class Action(db.Model):
 
     @staticmethod
     def _find_action(adventure, action_code: str):
-        action = get_action(adventure, action_code)
+        action: Action = get_action(adventure, action_code)
         if not action:
             raise ValueError(f"Invalid action_code {action_code}.") 
         return action
 
     @staticmethod
     def _change_action_active(adventure, action_code: str, value: bool):
-        action = Action._find_action(adventure,action_code)
+        action: Action = Action._find_action(adventure,action_code)
         action.active = value
 
     @staticmethod
     def _change_action_visible(adventure, action_code: str, value: bool):
-        action = Action._find_action(adventure,action_code)
+        action: Action = Action._find_action(adventure,action_code)
         action.visible = value
 
     @staticmethod
@@ -146,14 +147,14 @@ class Action(db.Model):
 
         if conditions_met:
             for action_code in function["action_codes"]:
-                executable = Action._find_action(adventure, action_code)
+                executable: Action = Action._find_action(adventure, action_code)
                 Action.execute(executable, adventure)
         else:
             if not "else_action_codes" in function:
                 return
             
             for action_code in function["else_action_codes"]:
-                executable = Action._find_action(adventure, action_code)
+                executable: Action = Action._find_action(adventure, action_code)
                 Action.execute(executable, adventure)
 
         return conditions_met
@@ -174,6 +175,8 @@ class Action(db.Model):
                 print("POSITION CHANGED TO", adventure.actual_position.code)
                 # entering actions
                 Action._execute_entering_actions(adventure)
+                if adventure.actual_position.end_position:
+                    adventure.phase = AdventurePhase.ENDED
             case Operation.CHANGE_POSITION_DESCRIPTION:
                 if action.position_code:
                     position = get_position_from_position_list(adventure.positions, action.position_code)

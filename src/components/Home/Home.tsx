@@ -2,7 +2,7 @@ import { startGame } from '../../services/gameService'
 import { GameInfo } from '../../types/gameInfo'
 import { Signal } from '@preact/signals-react'
 import { AppState } from '../../state'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   MainHeading,
@@ -12,18 +12,29 @@ import {
   Label,
   Paragraph,
   Option,
+  SubHeading,
 } from '../../globalStyles'
 import { Description, Row, StartGrid } from './homeStyles'
 
 export default function Home({ state }: { state: Signal<AppState> }) {
   const [player, setPlayer] = useState('')
-  const [selectedGameId, setSelectedGameId] = useState('')
+  const [selectedGameId, setSelectedGameId] = useState(
+    state.value.selectedGameId
+  )
   const [requestProcessing, setRequestProcessing] = useState(false)
+
+  useEffect(() => {
+    setSelectedGameId(state.value.selectedGameId)
+  }, [state.value.selectedGameId])
 
   async function start() {
     setRequestProcessing(true)
     await startGame(selectedGameId, player)
     setRequestProcessing(false)
+  }
+
+  function cancel() {
+    setSelectedGameId('')
   }
 
   function gameItem(game: GameInfo) {
@@ -35,12 +46,18 @@ export default function Home({ state }: { state: Signal<AppState> }) {
     )
   }
 
+  function selectedGameTitle() {
+    if (selectedGameId) {
+      return state.value.games?.find((g) => g.id === selectedGameId)?.title
+    }
+    return ''
+  }
+
   function selectedGameDescription() {
     if (selectedGameId) {
       return state.value.games?.find((g) => g.id === selectedGameId)
         ?.description
     }
-
     return ''
   }
 
@@ -59,17 +76,33 @@ export default function Home({ state }: { state: Signal<AppState> }) {
         Select a game, state your name and press Start to begin.
       </Paragraph>
       <StartGrid>
-        <Row>
-          <Label $width='10rem'>Games to choose from:</Label>
-          <Select
-            $width='12rem'
-            onChange={(e) => setSelectedGameId(e.target.value)}
-          >
-            <Option value=''>(Select an option)</Option>
-            {state.value.games && state.value.games.map(gameItem)}
-          </Select>
-        </Row>
-        <Description>{selectedGameDescription()}</Description>
+        {selectedGameId != '' || (
+          <Row>
+            <Label $width='10rem'>Games to choose from:</Label>
+            <Select
+              $width='12rem'
+              onChange={(e) => setSelectedGameId(e.target.value)}
+            >
+              <Option value=''>(Select an option)</Option>
+              {state.value.games && state.value.games.map(gameItem)}
+            </Select>
+          </Row>
+        )}
+        {!selectedGameId || (
+          <div>
+            <Row>
+              <SubHeading>{selectedGameTitle()}</SubHeading>
+            </Row>
+            <Row>
+              <Description>{selectedGameDescription()}</Description>
+            </Row>
+            <Row>
+              <Button onClick={cancel} disabled={requestProcessing}>
+                Cancel
+              </Button>
+            </Row>
+          </div>
+        )}
         <Row>
           <Label $width='10rem'>Player name:</Label>
           <Input

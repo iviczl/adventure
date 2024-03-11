@@ -61,7 +61,7 @@ def get_item_from_position(position, item_code):
     return next((i for i in position.items if i.code == item_code), None)
 
 def get_item(adventure, item_code: str):
-    item = get_item_from_position(adventure.actual_position, item_code)
+    item = get_item_from_positions(adventure.positions, item_code)
     if not item:
         item = get_item_from_player(adventure.player, item_code)
 
