@@ -28,7 +28,7 @@
     },
     {
       "code": "-8",
-      "description": "You came out of the dungeon alive and you have the vial of most importance in your pocket. The sunshine seems to smile on you and you cannot help yourself and smile back. You know well that a very long and happy life awaits you.",
+      "description": "You came out of the dungeon alive and you have the vial of most importance in your pocket. The sunshine seems to smile on you and you cannot help yourself and smile back. You know well that a very long and happy life awaits you. Your adventure ends here.",
       "end_position": true
     },
     {
@@ -521,7 +521,7 @@
           "code": "72",
           "description": "found key text",
           "operation": "cptd",
-          "position_description": "As you stroll around, you accidentally kick a metallic object on the ground. You pick it up and you see it is a rusty iron key. You think, it must be good for something and put it in you bag.",
+          "position_description": "As you stroll around, you accidentally kick a metallic object on the ground. You pick it up and you see it is a rusty iron key. You think that it must be good for something and put it in your bag.",
           "visible": false
         },
         {
@@ -685,7 +685,7 @@
           "code": "94",
           "description": "chest open text",
           "operation": "cptd",
-          "position_description": "The wooden chest has no lock on it and opens easily, though its hinges are a bit squeeky. On the bottom of the chest there is a small vial that has some faintly glowing bluish liquid in it. There is a time yellowed label on its side that says \"Life Essence\". You heart skips a beat because you know, you have just got the greatest gift from the god of chaos. If you can get out alive, you just need to drink it and your life will be lengthened by a hundred years at least. Carefully cover the vial in your handkerchief and put it in your inner pocket of your jacket.",
+          "position_description": "The wooden chest has no lock on it and opens easily, though its hinges are a bit squeeky. On the bottom of the chest there is a small vial that has some faintly glowing bluish liquid in it. There is a time yellowed label on its side that says \"Life Essence\". Your heart skips a beat because you know, you have just got the greatest gift from the god of chaos. If you can get out alive, you just need to drink it and your life will be lengthened by a hundred years at least. Carefully cover the vial in your handkerchief and put it in your inner pocket of your jacket.",
           "visible": false
         },
         {
@@ -704,7 +704,7 @@
           "code": "97",
           "description": "Go through the wide door",
           "operation": "cptd",
-          "position_description": "You go in a wide route that slowly goes upward. You feel this is it: you will get out in no time and... except as the route elevates, the ceiling comes closer and closer. First you need to bend a bit but soon you should go on your knees. You toss your torch in front of you and see that the route is even narrower further. You need to go back to the chest chamber."
+          "position_description": "You go in a wide route that slowly goes upward. You feel this is it: you will get out in no time and... except as the route elevates, the ceiling comes closer and closer. First you need to bend a bit but soon you should go on your knees. You toss your torch in front of you and see that the route is even lower further. You need to go back to the chest chamber."
         },
         {
           "code": "98",
