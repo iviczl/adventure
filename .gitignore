@@ -9,6 +9,8 @@ lerna-debug.log*
 
 node_modules
 dist
+build
+
 dist-ssr
 *.local
 
@@ -27,6 +29,8 @@ dist-ssr
 api/Include
 api/Lib
 api/Scripts
+*.db
+*.spec
 
 # python
 __pycache__

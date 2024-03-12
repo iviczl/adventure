@@ -68,7 +68,15 @@ def get_item(adventure, item_code: str):
     return item
 
 def prepare_actions(actions):
-    return stringify_action_codes(stringify_action_functions(actions))
+    return stringify_action_codes(stringify_action_functions(set_action_defaults(actions)))
+
+def set_action_defaults(actions):
+    for action in actions:
+        if not "visible" in action:
+            action["visible"] = True
+        if not "active" in action:
+            action["active"] = True
+    return actions
 
 def stringify_action_functions(actions):
     for action in actions:

@@ -15,6 +15,7 @@ class Operation(StrEnum):
    CHANGE_POSITION_DESCRIPTION = "cpd"
    CHANGE_POSITION_TEMPORARY_DESCRIPTION = "cptd"
    APPEND_POSITION_TEMPORARY_DESCRIPTION = "aptd"
+   PREPEND_POSITION_TEMPORARY_DESCRIPTION = "pptd"
    CHANGE_POSITION_VISITED = "cpv"
    CHANGE_ACTION_ACTIVE = "caa"
    CHANGE_ACTION_VISIBLE = "cav"
@@ -70,6 +71,8 @@ class Action(db.Model):
 
     @staticmethod
     def _execute_leaving_actions(adventure):
+        if not adventure.actual_position:
+            return
         for leaving_action in adventure.actual_position.leaving_actions:
             position_code = adventure.actual_position.code
             Action.execute(leaving_action, adventure)
@@ -121,7 +124,6 @@ class Action(db.Model):
                 has_item = bool(get_item_from_player(adventure.player, condition["item_code"]))
                 conditions_met = conditions_met and not(must_have ^ has_item)
             elif "position_must_have" in condition:
-                print("POSITION_MUST_HAVE")
                 must_have = condition["position_must_have"] == "true"
                 if not "position_code" in condition:
                     raise ValueError(f"Missing position code.")
@@ -130,8 +132,15 @@ class Action(db.Model):
                     raise ValueError(f"Missing item code.")
                 has_item = bool(get_item_from_position(position, condition["item_code"]))
                 conditions_met = conditions_met and not(must_have ^ has_item)
+            elif "position_code" in condition:
+                position = get_position_from_position_list(adventure.positions, condition["position_code"])
+                if "visited" in condition:
+                    visited = True if condition["visited"] == "true" else False
+                    conditions_met = conditions_met and (position.visited == visited)
+                elif "end_position" in condition:
+                    end_position = True if condition["end_position"] == "true" else False
+                    conditions_met = conditions_met and (position.end_position == end_position)
             elif "item_code" in condition:
-                print("ITEM_CODE")
                 item = get_item(adventure, condition["item_code"] )
                 if not item:
                     raise ValueError(f"Not existing item {condition["item_code"]}.")
@@ -161,9 +170,9 @@ class Action(db.Model):
 
     @staticmethod
     def execute(action, adventure):
-        if not action.active:
+        print("ACTION EXECUTING", action.code, "ACTIVE", action.active)
+        if not action.active or adventure.phase == AdventurePhase.ENDED:
             return
-        
         match action.operation:
             case Operation.CHANGE_POSITION:
                 if action.position_code == None:
@@ -171,10 +180,10 @@ class Action(db.Model):
                 # leaving actions
                 Action._execute_leaving_actions(adventure)
                 adventure.actual_position = get_position_from_position_list(adventure.positions, action.position_code)
-                adventure.actual_position.visited = True
                 print("POSITION CHANGED TO", adventure.actual_position.code)
                 # entering actions
                 Action._execute_entering_actions(adventure)
+                adventure.actual_position.visited = True
                 if adventure.actual_position.end_position:
                     adventure.phase = AdventurePhase.ENDED
             case Operation.CHANGE_POSITION_DESCRIPTION:
@@ -190,11 +199,18 @@ class Action(db.Model):
                     position = adventure.actual_position
                 position.temporary_description = action.position_description
             case Operation.APPEND_POSITION_TEMPORARY_DESCRIPTION:
-                if action.position_code:
+                if action.position_code != None and action.position_code != adventure.actual_position.code:
                     position = get_position_from_position_list(adventure.positions, action.position_code)
                 else:
                     position = adventure.actual_position
                 position.temporary_description = position.description + " " + action.position_description
+            case Operation.PREPEND_POSITION_TEMPORARY_DESCRIPTION:
+                if action.position_code != None and action.position_code != adventure.actual_position.code:
+                    position = get_position_from_position_list(adventure.positions, action.position_code)
+                else:
+                    position = adventure.actual_position
+                position.temporary_description = action.position_description + " " + position.description
+                print("TEMPORARY DESCRIPTION", position.temporary_description)
             case Operation.CHANGE_POSITION_VISITED:
                 if action.position_code:
                     position = get_position_from_position_list(adventure.positions, action.position_code)

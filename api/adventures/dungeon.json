@@ -33,7 +33,7 @@
     },
     {
       "code": "0",
-      "description": "You have just made a mistake. You spent all your money in the inn in Kirovang. Not only for beer but also for girls who was keen to sit in your lap when they saw you have a fat purse. You woke in the morning under the bench and now you have a splitting headache. You go to the counter to ask for water, but after that you feel, you should leave town immediately. You cannot remember clearly to last night, but somehow you have the feeling, you told some girls that the money you were about to spend was not yours originally. As you are a master thief, you know the situation will definitely become nasty very soon. So you pick up your jacket and backpack from the floor and without any word to the barmaids you leave the inn. You go into the wild east from Kirovang and walk into the Dark Forest. You go for a while, while listening to any suspicios noises, but you cannot hear anything. You feel lucky and you promise yourself you would not do the same mistake again. At noon you stop for a short break, drink some water and eat something. As you just finished a low rumbling noise comes from the thickets from the east. It is like an earthquake, but feels like a small one. You become curious and decided to investigate its source. You come clear of the forest to a clearing and now you are standing in front of a tiny but dangerous dungeon. What will you do?",
+      "description": "Now you are standing in front of a tiny but dangerous dungeon that apparently just came into existence by the god of chaos. What will you do?",
       "available_actions": [
         {
           "code": "0",
@@ -59,6 +59,13 @@
           "operation": "cp",
           "position_code": "-8",
           "visible": false
+        },
+        {
+          "code": "03",
+          "description": "backstory",
+          "operation": "pptd",
+          "position_description": "You have just made a mistake. You spent all your money in the inn in Kirovang. Not only for beer but also for girls who was keen to sit in your lap when they saw you have a fat purse. You woke in the morning under the bench and now you have a splitting headache. You go to the counter to ask for water, but after that you feel, you should leave town immediately. You cannot remember clearly to last night, but somehow you have the feeling, you told some girls that the money you were about to spend was not yours originally. As you are a master thief, you know the situation will definitely become nasty very soon. So you pick up your jacket and backpack from the floor and without any word to the barmaids you leave the inn. You go into the wild east from Kirovang and walk into the Dark Forest. You go for a while, while listening to any suspicios noises, but you cannot hear anything. You feel lucky and you promise yourself you would not do the same mistake again. At noon you stop for a short break, drink some water and eat something. As you just finished a low rumbling noise comes from the thickets from the east. It is like an earthquake, but feels like a small one. You become curious and decided to investigate its source. You come clear of the forest to a clearing.",
+          "visible": false
         }
       ],
       "entering_actions": [
@@ -69,6 +76,15 @@
           "function": {
             "conditions": [{ "player_must_have": true, "item_code": "6" }],
             "action_codes": ["02"]
+          }
+        },
+        {
+          "code": "04",
+          "description": "comes here first",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "position_code": "0", "visited": false }],
+            "action_codes": ["03"]
           }
         }
       ]
@@ -125,6 +141,14 @@
           "action_active": false,
           "active": true,
           "visible": false
+        },
+        {
+          "code": "18",
+          "description": "position description change",
+          "operation": "pptd",
+          "position_description": "You think it does not look as dangerous as some people would talk about it and you just need to be lucky or cunning to take a piece of treasure in it. So it is too seducing to not try to grab some of it.",
+          "active": true,
+          "visible": false
         }
       ],
       "entering_actions": [
@@ -137,6 +161,19 @@
           "function": {
             "conditions": [{ "item_code": "0", "state": "lit" }],
             "action_codes": ["14", "15"]
+          },
+          "value": "",
+          "active": true
+        },
+        {
+          "code": "17",
+          "description": "",
+          "operation": "con",
+          "position_code": "",
+          "item_code": "",
+          "function": {
+            "conditions": [{ "position_code": "1", "visited": false }],
+            "action_codes": ["18"]
           },
           "value": "",
           "active": true

@@ -61,18 +61,20 @@ def new():
     if not player_name or not game_id:
         return (jsonify({"message": "player and gameId arguments are mandatory."}), 400)
 
-    adventure = Adventure() # (player_name)
-    Adventure.load(_get_adventure(game_id)["path"], adventure)
-    adventure.player.name = player_name
     try:
+        adventure = Adventure() # (player_name)
+        Adventure.load(_get_adventure(game_id)["path"], adventure)
+        adventure.player.name = player_name
+        adventure.start()
+        print("ADVENTURE ACTUAL POSITION",adventure.actual_position)
+        response_data = adventure.actual_position.get_serializable()
         db.session.add(adventure)
-        print("ADVENTURE ID",adventure.id)
         db.session.commit()
         session[ADVENTURE] = adventure.id 
     except Exception as e:
         return jsonify({ "message": str(e)}), 400
 
-    response =  make_response(adventure.actual_position.get_serializable())
+    response =  make_response(response_data)
     return response, 201
 
 @app.route("/do", methods=["POST","OPTIONS"])

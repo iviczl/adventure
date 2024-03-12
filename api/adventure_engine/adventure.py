@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from adventure_engine.action import Action
+from adventure_engine.action import Action, Operation
 from adventure_engine.adventure_phase import AdventurePhase
 from adventure_engine.item import Item
 from adventure_engine.player import Player
@@ -52,6 +52,7 @@ class Adventure(db.Model):
             position = Position()
             position.code = position_data["code"]
             position.description = position_data["description"]
+            position.visited = False
             if "end_position" in position_data:
                 position.end_position = position_data["end_position"]
             adventure.positions.append(position)
@@ -65,15 +66,23 @@ class Adventure(db.Model):
                 position.leaving_actions = list(map(lambda a: Action(**a), prepare_actions(position_data["leaving_actions"])))
 
 
-        adventure.actual_position = get_position_from_position_list(adventure.positions, adventure.start_position_code)
-        adventure.actual_position.visited = True
-        adventure.phase = AdventurePhase.STARTED
+        # adventure.actual_position = get_position_from_position_list(adventure.positions, adventure.start_position_code)
+        # adventure.actual_position.visited = True
+        # adventure.phase = AdventurePhase.STARTED
         return adventure
 
     @staticmethod
     def load(file_path: str, adventure):
         rawData = load_json(file_path)
         return Adventure.build(rawData, adventure)
+
+    def start(self):
+        action = Action()
+        action.operation = Operation.CHANGE_POSITION
+        action.position_code = self.start_position_code
+        action.active = True
+        self.phase = AdventurePhase.STARTED
+        Action.execute(action, self)
 
     def do(self, action_code: str):
         action: Action = None
@@ -83,5 +92,4 @@ class Adventure(db.Model):
             action = next((a for a in self.available_actions if a.code == action_code), None)
         if action == None:
             raise RuntimeError(f"Invalid action code in position: {self.actual_position.code}:{action_code}")
-        print("EXECUTING ACTION",action.code)
         Action.execute(action, self)
