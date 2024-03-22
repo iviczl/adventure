@@ -64,7 +64,7 @@
           "code": "03",
           "description": "backstory",
           "operation": "pptd",
-          "position_description": "You have just made a mistake. You spent all your money in the inn in Kirovang. Not only for beer but also for girls who was keen to sit in your lap when they saw you have a fat purse. You woke in the morning under the bench and now you have a spliting headache. You go to the counter to ask for water, but after that you feel, you should leave town immediately. You cannot remember clearly to last night, but somehow you have the feeling, you told some girls that the money you were about to spend was not yours originally. As you are a master thief, you know the situation will definitely become nasty very soon. So you pick up your jacket and backpack from the floor and without any word to the barmaids you leave the inn. You go into the wild east from Kirovang and walk into the Dark Forest. You go for a while, while listening to any suspicious noises, but you cannot hear anything. You feel lucky and you promise yourself you would not do the same mistake again. At noon you stop for a short break, drink some water and eat something. As you just finished a low rumbling noise comes from the thickets from the east. It is like an earthquake, but feels like a small one. You become curious and decided to investigate its source. You come clear of the forest to a clearing.",
+          "position_description": "You have just made a mistake. You spent all your money in the inn in Kirovang. Not only for beer but also for girls who were keen to sit in your lap when they saw you have a fat purse. You woke in the morning under the bench and now you have a splitting headache. You go to the counter to ask for water, but after that you feel, you should leave town immediately. You cannot remember clearly to last night, but somehow you have the feeling, you told some girls that the money you were about to spend was not yours originally. As you are a master thief, you know the situation will definitely become nasty very soon. So you pick up your jacket and backpack from the floor and without any word to the barmaids you leave the inn. You go into the wild east from Kirovang and walk into the Dark Forest. You go for a while, while listening to any suspicious noises, but you cannot hear anything. You feel lucky and you promise yourself you would not do the same mistake again. At noon you stop for a short break, drink some water and eat something. As you just finished a low rumbling noise comes from the thickets from the east. It is like an earthquake, but feels like a small one. You become curious and decided to investigate its source. You come clear of the forest to a clearing.",
           "visible": false
         }
       ],
@@ -323,7 +323,7 @@
     },
     {
       "code": "4",
-      "description": "As you advancing forward the smell becomes really stomach lurching so you become very nervous. You arrive to a huge room where you cannot see anything but your immediate surroundings. As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
+      "description": "As you are advancing forward the smell becomes really stomach lurching so you become very nervous. You arrive to a huge room where you cannot see anything but your immediate surroundings. As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
       "available_actions": [
         {
           "code": "40",
@@ -481,7 +481,7 @@
           "code": "64",
           "description": "fight text",
           "operation": "aptd",
-          "position_description": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed you skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "position_description": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed your skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
           "active": true,
           "visible": false
         },
@@ -526,7 +526,7 @@
     },
     {
       "code": "-5",
-      "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut.You hear a sudden noise behind and spin around. A wooden object crushes into your forehead. You hear that an ork yells victoriously and you lose consciousness. Your adventure ended.",
+      "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut. You hear a sudden noise behind and spin around. A wooden object crushes into your forehead. You hear that an ork yells victoriously and you lose consciousness. Your adventure ended.",
       "end_position": true
     },
     {
