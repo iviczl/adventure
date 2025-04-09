@@ -1,0 +1,796 @@
+{
+  "code": "dungeon",
+  "title": "Dungeon Mission",
+  "description": "Your task is to clear out a dangerous dungeon. (This is a test mission to try out the capabilities of the adventure engine, so it is a small one.)",
+  "player": {
+    "name": "",
+    "items": [
+      {
+        "code": "0",
+        "name": "torch",
+        "description": "a normal torch",
+        "state": "not lit"
+      }
+    ]
+  },
+  "startPositionCode": "0",
+  "availableActions": [],
+  "positions": [
+    {
+      "code": "-1",
+      "description": "Your adventure is ended.",
+      "endPosition": true
+    },
+    {
+      "code": "-2",
+      "description": "In the darkness you fell off a staircase and broke your neck. You are dead, so your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "-8",
+      "description": "You came out of the dungeon alive and you have the vial of most importance in your pocket. The sunshine seems to smile on you and you cannot help yourself and smile back. You know well that a very long and happy life awaits you. Your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "0",
+      "description": "Now you are standing in front of a tiny but dangerous dungeon that apparently just came into existence by the god of chaos. What will you do?",
+      "availableActions": [
+        {
+          "code": "0",
+          "description": "Go in",
+          "operation": "cp",
+          "positionCode": "1",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "1",
+          "description": "Quit",
+          "operation": "cp",
+          "positionCode": "-1",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "02",
+          "description": "success",
+          "operation": "cp",
+          "positionCode": "-8",
+          "visible": false
+        },
+        {
+          "code": "03",
+          "description": "backstory",
+          "operation": "pptd",
+          "positionDescription": "You have just made a mistake. You spent all your money in the inn in Kirovang. Not only for beer but also for girls who were keen to sit in your lap when they saw you have a fat purse. You woke in the morning under the bench and now you have a splitting headache. You go to the counter to ask for water, but after that you feel, you should leave town immediately. You cannot remember clearly to last night, but somehow you have the feeling, you told some girls that the money you were about to spend was not yours originally. As you are a master thief, you know the situation will definitely become nasty very soon. So you pick up your jacket and backpack from the floor and without any word to the barmaids you leave the inn. You go into the wild east from Kirovang and walk into the Dark Forest. You go for a while, while listening to any suspicious noises, but you cannot hear anything. You feel lucky and you promise yourself you would not do the same mistake again. At noon you stop for a short break, drink some water and eat something. As you just finished a low rumbling noise comes from the thickets from the east. It is like an earthquake, but feels like a small one. You become curious and decided to investigate its source. You come clear of the forest to a clearing.",
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "01",
+          "description": "has vial",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "playerMustHave": true, "itemCode": "6" }],
+            "actionCodes": ["02"]
+          }
+        },
+        {
+          "code": "04",
+          "description": "comes here first",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "positionCode": "0", "visited": false }],
+            "actionCodes": ["03"]
+          }
+        }
+      ]
+    },
+    {
+      "code": "1",
+      "description": "It appears to be dark inside. After a further few steps you cannot see a thing. What will you do?",
+      "availableActions": [
+        {
+          "code": "10",
+          "description": "Light a torch",
+          "operation": "ls",
+          "actionCodes": ["13", "14", "15"],
+          "active": true
+        },
+        {
+          "code": "11",
+          "description": "Turn back to the entrance",
+          "operation": "cp",
+          "positionCode": "0",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "12",
+          "description": "Go in further",
+          "operation": "cp",
+          "positionCode": "2",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "13",
+          "description": "Light a torch",
+          "operation": "cis",
+          "itemCode": "0",
+          "value": "lit",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "14",
+          "description": "position description change",
+          "operation": "cpd",
+          "positionDescription": "It is fairly light, because you lit a torch. In one direction is the entrance of the dungeon and in the other is a long stone staircase that leads downward.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "15",
+          "description": "action active change",
+          "operation": "caa",
+          "actionCode": "10",
+          "actionActive": false,
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "18",
+          "description": "position description change",
+          "operation": "pptd",
+          "positionDescription": "You think it does not look as dangerous as some people would talk about it and you just need to be lucky or cunning to take a piece of treasure in it. So it is too seducing to not try to grab some of it.",
+          "active": true,
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "16",
+          "description": "",
+          "operation": "con",
+          "positionCode": "",
+          "itemCode": "",
+          "function": {
+            "conditions": [{ "itemCode": "0", "state": "lit" }],
+            "actionCodes": ["14", "15"]
+          },
+          "value": "",
+          "active": true
+        },
+        {
+          "code": "17",
+          "description": "",
+          "operation": "con",
+          "positionCode": "",
+          "itemCode": "",
+          "function": {
+            "conditions": [{ "positionCode": "1", "visited": false }],
+            "actionCodes": ["18"]
+          },
+          "value": "",
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "description": "At the base of the staircase the dungeon passage widens and becomes a chamber that is also a junction. Seeing from the staircase there is a way to the right, one forward and there is one to the left. To the left you cannot see much and the way takes a turn somewhere. To the right you can see great darkness and the walls damply glistens. Forward is a clear way with smooth stone floor but some slight bad smell lingers, like in some lizard den.",
+      "availableActions": [
+        {
+          "code": "20",
+          "description": "Turn back to the staircase",
+          "operation": "cp",
+          "positionCode": "1",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "21",
+          "description": "Go left",
+          "operation": "cp",
+          "positionCode": "8",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "22",
+          "description": "Go right",
+          "operation": "cp",
+          "positionCode": "5",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "23",
+          "description": "Go forward",
+          "operation": "cp",
+          "positionCode": "3",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "24",
+          "description": "position change",
+          "operation": "cp",
+          "positionCode": "-2",
+          "active": true,
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "201",
+          "description": "",
+          "operation": "con",
+          "positionCode": "",
+          "itemCode": "",
+          "function": {
+            "conditions": [{ "itemCode": "0", "state": "not lit" }],
+            "actionCodes": ["24"]
+          },
+          "value": "",
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "3",
+      "description": "You arrived to a small round chamber that looks like some man made cellar. You look around and see nothing except some tattered rags next to the wall on the floor. The walls are smooth and seeing sooth on the arched ceiling indicates someone else also used a torch here. The only other way apart from the entrance is a narrow doorway forward from where a really foul stench comes.",
+      "items": [
+        {
+          "code": "1",
+          "name": "knife",
+          "description": "sturdy knife with elaborate handle",
+          "state": "in bag"
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "30",
+          "description": "Turn back to the junction",
+          "operation": "cp",
+          "positionCode": "2",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "31",
+          "description": "Go forward",
+          "operation": "cp",
+          "positionCode": "4",
+          "itemCode": "",
+          "function": null,
+          "active": true
+        },
+        {
+          "code": "32",
+          "description": "Pick up the rag from the floor",
+          "operation": "ls",
+          "actionCodes": ["33", "34", "35"],
+          "active": true
+        },
+        {
+          "code": "33",
+          "description": "pick up knife",
+          "operation": "pui",
+          "itemCode": "1",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "34",
+          "description": "pick up knife desc",
+          "operation": "cptd",
+          "positionDescription": "As you pick up the rag you realise that it is heavier than you thought. You unwrap it and inside you find a knife with a nice handle. It has comfortable grip so you think it must be good practically too. You put it in your bag.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "35",
+          "description": "inactivate 32",
+          "operation": "caa",
+          "actionCode": "32",
+          "actionActive": false,
+          "active": true,
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "301",
+          "description": "has the knife",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "playerMustHave": true, "itemCode": "1" }],
+            "actionCodes": ["35"]
+          },
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "4",
+      "description": "As you are advancing forward the smell becomes really stomach lurching so you become very nervous. You arrive to a huge room where you cannot see anything but your immediate surroundings. As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
+      "availableActions": [
+        {
+          "code": "40",
+          "description": "Make your move",
+          "operation": "ran",
+          "actionCodes": ["41", "42"],
+          "active": true
+        },
+        {
+          "code": "41",
+          "description": "lucky end",
+          "operation": "cp",
+          "positionCode": "-4",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "42",
+          "description": "unlucky end",
+          "operation": "cp",
+          "positionCode": "-3",
+          "active": true,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "code": "-3",
+      "description": "You turn around on your heel quickly, but somewhat late. You sense as something sharp sinks in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "-4",
+      "description": "Your jump on your left while turning around. As you turn you still see a big snake demon in front of you, but your left arm goes numb and you know the demon bit you. You quickly run to the entrance and hastly quit the dungeon. Your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "5",
+      "description": "As you go in the route the floor and the walls become dark and moist and slippery in places. You are in a long, wet corridor. You become somewhat nervous as you can hear small noises like small furry legs are advancing carefully and sneakily.",
+      "availableActions": [
+        {
+          "code": "50",
+          "description": "Pull out your knife",
+          "operation": "ls",
+          "actionCodes": ["53", "54", "55"],
+          "active": false
+        },
+        {
+          "code": "51",
+          "description": "Go forward",
+          "operation": "cp",
+          "positionCode": "6"
+        },
+        {
+          "code": "52",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "positionCode": "2"
+        },
+        {
+          "code": "53",
+          "description": "knife out",
+          "operation": "cis",
+          "itemCode": "1",
+          "value": "in hand",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "54",
+          "description": "desc",
+          "operation": "cptd",
+          "positionDescription": "You pull out your knife and hold your torch in front of you. You see a lot of big hairy spiders on the walls both sides. You are afraid they will attack you, but actually they flee from the light into cracks in the walls.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "55",
+          "description": "inactivate 50",
+          "operation": "caa",
+          "actionCode": "50",
+          "actionActive": false,
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "56",
+          "description": "activate 50",
+          "operation": "caa",
+          "actionCode": "50",
+          "actionActive": true,
+          "active": true,
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "301",
+          "description": "has the knife",
+          "operation": "con",
+          "function": {
+            "conditions": [
+              { "playerMustHave": true, "itemCode": "1" },
+              { "itemCode": "1", "state": "in bag" }
+            ],
+            "actionCodes": ["56"]
+          },
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "6",
+      "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut. From behind the hut waves' noise can be heard faintly.",
+      "items": [
+        {
+          "code": "3",
+          "name": "ork",
+          "description": "a disgusting ork",
+          "state": "alive"
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "60",
+          "description": "Go to the water",
+          "operation": "cp",
+          "positionCode": "7",
+          "active": true
+        },
+        {
+          "code": "61",
+          "description": "Go to the corridor",
+          "operation": "cp",
+          "positionCode": "5",
+          "active": true
+        },
+        {
+          "code": "62",
+          "description": "dead ork",
+          "operation": "aptd",
+          "positionDescription": "There is a dead ork on the ground.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "63",
+          "description": "dead by ork",
+          "operation": "cp",
+          "positionCode": "-5",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "64",
+          "description": "fight text",
+          "operation": "aptd",
+          "positionDescription": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed your skull. A filthy, disgusting ork that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The ork collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "65",
+          "description": "kill ork",
+          "operation": "cis",
+          "itemCode": "3",
+          "value": "dead",
+          "active": true,
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "601",
+          "description": "",
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "itemCode": "3", "state": "dead" }],
+              "actionCodes": ["62"]
+            },
+            {
+              "conditions": [
+                { "itemCode": "3", "state": "alive" },
+                { "itemCode": "1", "state": "in hand" }
+              ],
+              "actionCodes": ["64", "65"]
+            },
+            {
+              "conditions": [
+                { "itemCode": "3", "state": "alive" },
+                { "itemCode": "1", "state": "in bag" }
+              ],
+              "actionCodes": ["63"]
+            }
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "code": "-5",
+      "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an ork hut. You hear a sudden noise behind and spin around. A wooden object crushes into your forehead. You hear that an ork yells victoriously and you lose consciousness. Your adventure ended.",
+      "endPosition": true
+    },
+    {
+      "code": "7",
+      "description": "You go over the hut and see that the cavern here becomes even wider and the ground drops a few feet. There is an underground lake in front of you with black, cold water. Waves roll lazily on the shore but you cannot see anything interesting. The ork obviously had not have a boat and the water is not inviting at all, so you do not want to go in. The lake is huge and reaches the walls of the cavern on every other side. It is a dead end.",
+      "items": [
+        {
+          "code": "2",
+          "name": "key",
+          "description": "a rusty key",
+          "state": "in bag"
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "70",
+          "description": "Go back to the hut",
+          "operation": "cp",
+          "positionCode": "6",
+          "active": true
+        },
+        {
+          "code": "71",
+          "description": "Look around the lake shore",
+          "operation": "ls",
+          "actionCodes": ["72", "73", "74"]
+        },
+        {
+          "code": "72",
+          "description": "found key text",
+          "operation": "cptd",
+          "positionDescription": "As you stroll around, you accidentally kick a metallic object on the ground. You pick it up and you see it is a rusty iron key. You think that it must be good for something and put it in your bag.",
+          "visible": false
+        },
+        {
+          "code": "73",
+          "description": "put key in bag",
+          "operation": "pui",
+          "itemCode": "2",
+          "visible": false
+        },
+        {
+          "code": "74",
+          "description": "inactivate 71",
+          "operation": "caa",
+          "actionCode": "71",
+          "actionActive": false,
+          "visible": false
+        }
+      ]
+    },
+    {
+      "code": "8",
+      "description": "From the junction the way turns right then left and right again. After a short while you arrive at a rusty iron door that blocks your way. The door looks old but massive, so you will not consider to break it with a kick. It has a keyhole and an also rusty handle above it.",
+      "items": [
+        {
+          "code": "4",
+          "name": "door",
+          "description": "rusty iron door",
+          "state": "locked"
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "80",
+          "description": "Put the iron key in the keyhole and turn it.",
+          "operation": "ls",
+          "actionCodes": ["81", "82", "83", "87"],
+          "active": false
+        },
+        {
+          "code": "81",
+          "description": "unlock door",
+          "operation": "cis",
+          "itemCode": "4",
+          "value": "unlocked",
+          "visible": false
+        },
+        {
+          "code": "82",
+          "description": "inactivate 80",
+          "operation": "caa",
+          "actionCode": "80",
+          "actionActive": false,
+          "visible": false
+        },
+        {
+          "code": "83",
+          "description": "activate 84",
+          "operation": "caa",
+          "actionCode": "84",
+          "actionActive": true,
+          "visible": false
+        },
+        {
+          "code": "84",
+          "description": "Go through the door",
+          "operation": "cp",
+          "positionCode": "9",
+          "active": false
+        },
+        {
+          "code": "85",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "positionCode": "2"
+        },
+        {
+          "code": "86",
+          "description": "activate 80",
+          "operation": "caa",
+          "actionCode": "80",
+          "actionActive": true,
+          "visible": false
+        },
+        {
+          "code": "87",
+          "description": "open door text",
+          "operation": "cptd",
+          "positionDescription": "You unlocked the door and it is open now.",
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "801",
+          "description": "has key, door open/locked",
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "itemCode": "4", "state": "open" }],
+              "actionCodes": ["87"]
+            },
+            {
+              "conditions": [
+                { "playerMustHave": true, "itemCode": "2" },
+                { "itemCode": "4", "state": "locked" }
+              ],
+              "actionCodes": ["86"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "9",
+      "description": "You arrived in a chamber that has an elegant feel to it. There is a bit of dust, but there are elaborate embellishments on the wall and even on the ceiling and there are two big chests at the furthest two corners of the chamber. One seems to be a perfectly new copper chest and the other is a dusty, old wooden one. There are also two more ways out of the chamber: one narrow and one wider.",
+      "items": [
+        {
+          "code": "5",
+          "name": "wooden chest",
+          "description": "dusty, old wooden chest",
+          "state": "closed"
+        },
+        {
+          "code": "6",
+          "name": "vial",
+          "description": "life essence vial",
+          "state": ""
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "90",
+          "description": "Inspect the wooden chest",
+          "operation": "ls",
+          "actionCodes": ["91", "92", "93", "94"]
+        },
+        {
+          "code": "91",
+          "description": "open chest",
+          "operation": "cis",
+          "itemCode": "5",
+          "value": "open",
+          "visible": false
+        },
+        {
+          "code": "92",
+          "description": "pick up vial",
+          "operation": "pui",
+          "itemCode": "6",
+          "visible": false
+        },
+        {
+          "code": "93",
+          "description": "inactivate 90",
+          "operation": "caa",
+          "actionCode": "90",
+          "actionActive": false,
+          "visible": false
+        },
+        {
+          "code": "94",
+          "description": "chest open text",
+          "operation": "cptd",
+          "positionDescription": "The wooden chest has no lock on it and opens easily, though its hinges are a bit squeeky. On the bottom of the chest there is a small vial that has some faintly glowing bluish liquid in it. There is a time yellowed label on its side that says \"Life Essence\". Your heart skips a beat because you know, you have just got the greatest gift from the god of chaos. If you can get out alive, you just need to drink it and your life will be lengthened by a hundred years at least. Carefully cover the vial in your handkerchief and put it in your inner pocket of your jacket.",
+          "visible": false
+        },
+        {
+          "code": "95",
+          "description": "Inspect the copper chest",
+          "operation": "cp",
+          "positionCode": "-7"
+        },
+        {
+          "code": "96",
+          "description": "Go back to the junction",
+          "operation": "cp",
+          "positionCode": "2"
+        },
+        {
+          "code": "97",
+          "description": "Go through the wide door",
+          "operation": "cptd",
+          "positionDescription": "You go in a wide route that slowly goes upward. You feel this is it: you will get out in no time and... except as the route elevates, the ceiling comes closer and closer. First you need to bend a bit but soon you should go on your knees. You toss your torch in front of you and see that the route is even lower further. You need to go back to the chest chamber."
+        },
+        {
+          "code": "98",
+          "description": "Go through the narrow door",
+          "operation": "cp",
+          "positionCode": "10"
+        },
+        {
+          "code": "99",
+          "description": "chest already open text",
+          "operation": "aptd",
+          "positionDescription": "The wooden chest is already wide open and seems to be empty.",
+          "visible": false
+        }
+      ],
+      "enteringActions": [
+        {
+          "code": "901",
+          "description": "chest open",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "itemCode": "5", "state": "open" }],
+            "actionCodes": ["99"]
+          }
+        }
+      ]
+    },
+    {
+      "code": "-7",
+      "description": "You open the lid of the copper chest and as it was assumable it opens very easily. You lean over the rim to see what is inside. But in a moment the chest grows teeth and the lid grabs you neck. It is a mimic! You try to break free but to no avail. The mimic adjusts your body so you are already half way in its mouth. You cannot escape and slowly slip into it. Your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "10",
+      "description": "You are in a narrow route. In one direction there is an entrance to a chamber with an elegant doorway, in the other there is a steep slope upward.",
+      "availableActions": [
+        {
+          "code": "101",
+          "description": "Go towards the slope",
+          "operation": "cp",
+          "positionCode": "1"
+        },
+        {
+          "code": "102",
+          "description": "Go towards the chamber",
+          "operation": "cp",
+          "positionCode": "9"
+        }
+      ]
+    }
+  ]
+}
