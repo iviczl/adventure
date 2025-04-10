@@ -3,10 +3,13 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"text-adventure/engine"
 	"text-adventure/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 var adventureFilePath = "adventures"
@@ -68,4 +71,17 @@ func Load(code string, adventure *engine.Adventure) (*engine.Adventure, error) {
 	}
 	return adventure, jsonErr
 	// return Build(rawData, adventure)
+}
+
+func RequestBody(c *gin.Context) (map[string]interface{}, error) {
+	rawBody, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		return nil, err
+	}
+	var body map[string]interface{}
+	if err := json.Unmarshal(rawBody, &body); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return nil, err
+	}
+	return body, nil
 }

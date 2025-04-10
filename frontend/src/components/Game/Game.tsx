@@ -12,7 +12,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
 
   async function callAction(id: string) {
     setRequestProcessing(true)
-    await takeAction(id)
+    await takeAction(id, state.value.player, state.value.adventureId)
     setRequestProcessing(false)
   }
 

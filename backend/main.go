@@ -1,17 +1,23 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	adventureEngine "text-adventure/engine"
 	"text-adventure/models"
 	"text-adventure/utils"
 	"time"
+
+	"github.com/gin-contrib/sessions"
+	// "github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/memstore"
+
+	"encoding/gob"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
@@ -75,10 +81,17 @@ func CorsMiddleware() gin.HandlerFunc {
 	}
 }
 
+func init() {
+	gob.Register(adventureEngine.Adventure{})
+	gob.Register(make(map[string]interface{}))
+}
+
 func main() {
 	fmt.Println("Service application launched.", time.Now().Format("2006-01-02 15:04:05"))
-	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals, syscall.SIGINT, syscall.SIGTERM)
+
+	shutDownSignals := make(chan os.Signal, 1)
+	signal.Notify(shutDownSignals, syscall.SIGINT, syscall.SIGTERM)
+
 	fmt.Println("Initializing database client...")
 	db, err := gorm.Open(sqlite.Open(filepath.Join(".", "db", "text-adventure.db")), &gorm.Config{})
 	if err != nil {
@@ -94,8 +107,12 @@ func main() {
 	}
 	fmt.Println("Database client initialized.")
 	fmt.Println("Initializing HTTP server...")
+	// store := cookie.NewStore([]byte("secret"))
+	store := memstore.NewStore([]byte("secret"))
+	store.Options(sessions.Options{MaxAge: 0, SameSite: http.SameSiteNoneMode, Secure: true})
 	engine := gin.Default()
 	engine.Use(CorsMiddleware())
+	engine.Use(sessions.Sessions("session", store))
 
 	engine.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -106,13 +123,8 @@ func main() {
 	engine.GET("/games", func(c *gin.Context) { c.JSON(200, utils.AdventureInfos()) })
 	engine.GET("/headers", headers)
 	engine.POST("/new", func(c *gin.Context) {
-		rawBody, err := io.ReadAll(c.Request.Body)
+		body, err := utils.RequestBody(c)
 		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		var body map[string]interface{}
-		if err := json.Unmarshal(rawBody, &body); err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
@@ -130,27 +142,63 @@ func main() {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		session := sessions.Default(c)
 		db.Create(adventure)
+		value, _ := json.Marshal(adventure)
+		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), value)
+		fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", player, adventure.Id))
+		session.Save()
 		c.JSON(200, adventure.ActualPosition)
 	})
 
-	server := &http.Server{
-		Addr:    fmt.Sprintf("localhost:%v", port),
-		Handler: engine,
-	}
+	engine.POST("/do", func(c *gin.Context) {
+		body, err := utils.RequestBody(c)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		player := body["player"].(string)
+		adventureId := body["adventureId"].(string)
+		actionCode := body["actionCode"].(string)
+		if player == "" || adventureId == "" || actionCode == "" {
+			c.JSON(400, gin.H{"error": "Missing required parameters"})
+			return
+		}
+		session := sessions.Default(c)
+		adventureValue := session.Get(fmt.Sprintf("%v:%v", player, adventureId))
+		fmt.Println("Session entry key:", fmt.Sprintf("%v:%v", player, adventureId))
+		if adventureValue == nil {
+			c.JSON(404, gin.H{"error": "Adventure not found"})
+			return
+		}
+		adventure := &adventureEngine.Adventure{}
+		err = json.Unmarshal(adventureValue.([]byte), &adventure)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Adventure unmarshaling failed. " + err.Error()})
+			return
+		}
+		err = adventure.Do(actionCode)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), adventure)
+		session.Save()
+		c.JSON(200, adventure.ActualPosition)
+	})
 
 	go func() {
 		fmt.Printf("HTTP server is listening on port %v. %v\n", port, time.Now().Format("2006-01-02 15:04:05"))
-		err := server.ListenAndServe()
+		err := engine.Run(fmt.Sprintf("localhost:%v", port)) // listen and serve on 0.0.0.0:8080
 		if err != nil && err != http.ErrServerClosed {
-			fmt.Println("Server error:", err)
+			fmt.Println("HTTP server error:", err)
 		}
 	}()
 
-	// router.Run(fmt.Sprintf(":%v", port)) // listen and serve on 0.0.0.0:8080
-	signal := <-osSignals
+	signal := <-shutDownSignals
 	if signal != nil {
-		fmt.Println("Received signal:", signal)
+		fmt.Println("Received signal:", signal.String())
 	}
-	fmt.Println("Server has exited.")
+
+	fmt.Println("HTTP server has exited.")
 }

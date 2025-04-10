@@ -39,16 +39,21 @@ export async function startGame(gameId: string, player: string) {
     ...state.value,
     selectedGameId: gameId,
     player: player,
+    adventureId: position.adventureId,
     actualPosition: position,
   }
 }
 
-export async function takeAction(actionId: string) {
+export async function takeAction(
+  actionId: string,
+  player: string,
+  adventureId: string
+) {
   abortController = new AbortController()
   const result = await doFetch(`${apiBasePath}/do`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ actionId }),
+    body: JSON.stringify({ actionCode: actionId, player, adventureId }),
   })
 
   if (assertError(result)) {

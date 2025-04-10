@@ -483,3 +483,22 @@ func (adventure *Adventure) Start() error {
 	adventure.Phase = models.STARTED
 	return adventure.ExecuteAction(action)
 }
+
+func (adventure *Adventure) Do(actionCode string) error {
+	action := &models.Action{}
+	if adventure.ActualPosition != nil {
+		action = getActionFromPosition(adventure.ActualPosition, actionCode)
+	}
+	if action == nil && len(adventure.AvailableActions) > 0 {
+		executableAction, err := adventure.findAction(actionCode)
+		if err != nil {
+			return fmt.Errorf("action not found: %s", actionCode)
+		}
+		action = executableAction
+	}
+	err := adventure.ExecuteAction(action)
+	if err != nil {
+		return fmt.Errorf("error executing action: %s", err.Error())
+	}
+	return nil
+}

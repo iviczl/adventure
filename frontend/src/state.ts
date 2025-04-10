@@ -6,6 +6,7 @@ export type AppState = {
   player: string
   games: GameInfo[] | undefined
   selectedGameId: string
+  adventureId: string
   actualPosition: Position | undefined
 }
 
@@ -13,5 +14,6 @@ export const state = signal({
   player: '',
   games: undefined,
   selectedGameId: '',
+  adventureId: '',
   actualPosition: undefined,
 } as AppState)

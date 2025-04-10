@@ -29,6 +29,10 @@ export default function Home({ state }: { state: Signal<AppState> }) {
 
   async function start() {
     setRequestProcessing(true)
+    state.value = {
+      ...state.value,
+      player,
+    }
     await startGame(selectedGameId, player)
     setRequestProcessing(false)
   }
