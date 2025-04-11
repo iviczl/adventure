@@ -142,13 +142,20 @@ func main() {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
+		temporaryDescription := ""
+		if adventure.ActualPosition.TemporaryDescription != "" {
+			temporaryDescription = adventure.ActualPosition.TemporaryDescription
+			adventure.ActualPosition.TemporaryDescription = ""
+		}
 		session := sessions.Default(c)
 		db.Create(adventure)
+		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
+		actualPosition.Description = temporaryDescription
 		value, _ := json.Marshal(adventure)
 		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), value)
 		fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", player, adventure.Id))
 		session.Save()
-		c.JSON(200, adventure.ActualPosition)
+		c.JSON(200, actualPosition)
 	})
 
 	engine.POST("/do", func(c *gin.Context) {
@@ -182,9 +189,12 @@ func main() {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
-		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), adventure)
+		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
+		value, _ := json.Marshal(adventure)
+		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), value)
+		// session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), adventure)
 		session.Save()
-		c.JSON(200, adventure.ActualPosition)
+		c.JSON(200, actualPosition)
 	})
 
 	go func() {

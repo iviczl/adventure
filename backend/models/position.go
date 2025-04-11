@@ -41,28 +41,61 @@ func (p *Position) UnmarshalJSON(text []byte) error {
 	return nil
 }
 
-func (p *Position) MarshalJSON() ([]byte, error) {
-	type Alias Position
+func AdjustedActualPosition(p *Position) *Position {
 	description := p.Description
 	if p.TemporaryDescription != "" {
 		description = p.TemporaryDescription
+		p.TemporaryDescription = ""
 	}
 	availableActions := slices.Collect(func(yield func(*Action) bool) {
 		for _, a := range p.AvailableActions {
-			if *(a.Active) && *(a.Visible) {
+			if *a.Active && *a.Visible {
 				if !yield(a) {
 					return
 				}
 			}
 		}
 	})
-	return json.Marshal(&struct {
-		Description      string    `json:"description"`
-		AvailableActions []*Action `json:"availableActions"`
-		*Alias
-	}{
-		Description:      description,
-		AvailableActions: availableActions,
-		Alias:            (*Alias)(p),
-	})
+	if availableActions == nil {
+		availableActions = []*Action{}
+	}
+
+	actual := &Position{
+		Id:                        p.Id,
+		Code:                      p.Code,
+		Description:               description,
+		Visited:                   p.Visited,
+		EndPosition:               p.EndPosition,
+		AvailableActions:          availableActions,
+		EnteringActions:           p.EnteringActions,
+		LeavingActions:            p.LeavingActions,
+		Items:                     p.Items,
+		AdventureId:               p.AdventureId,
+		ActualPositionAdventureId: p.ActualPositionAdventureId,
+		TemporaryDescription:      p.TemporaryDescription,
+	}
+	return actual
 }
+
+// func (p *Position) MarshalJSON() ([]byte, error) {
+// 	type Alias Position
+// 	availableActions := slices.Collect(func(yield func(*Action) bool) {
+// 		for _, a := range p.AvailableActions {
+// 			if *(a.Active) && *(a.Visible) {
+// 				if !yield(a) {
+// 					return
+// 				}
+// 			}
+// 		}
+// 	})
+// 	if availableActions == nil {
+// 		availableActions = []*Action{}
+// 	}
+// 	return json.Marshal(&struct {
+// 		AvailableActions []*Action `json:"availableActions"`
+// 		*Alias
+// 	}{
+// 		AvailableActions: availableActions,
+// 		Alias:            (*Alias)(p),
+// 	})
+// }

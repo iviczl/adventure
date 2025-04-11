@@ -602,7 +602,7 @@
           "description": "unlock door",
           "operation": "cis",
           "itemCode": "4",
-          "value": "unlocked",
+          "value": "open",
           "visible": false
         },
         {

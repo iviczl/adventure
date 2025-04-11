@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -84,11 +83,5 @@ func (a *Action) UnmarshalJSON(text []byte) error {
 		return err
 	}
 	*a = Action(aux)
-	if a.Code == "03" {
-		fmt.Println("ACTION VISIBLE:", *(a.Visible))
-		fmt.Println("ACTION ACTIVE:", *(a.Active))
-		fmt.Println("ACTION ACTIONVISIBLE:", *(a.ActionVisible))
-		fmt.Println("ACTION ACTIONACTIVE:", *(a.ActionActive))
-	}
 	return nil
 }

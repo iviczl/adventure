@@ -69,6 +69,7 @@ func Load(code string, adventure *engine.Adventure) (*engine.Adventure, error) {
 	if jsonErr != nil {
 		return nil, jsonErr
 	}
+
 	return adventure, jsonErr
 	// return Build(rawData, adventure)
 }

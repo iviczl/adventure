@@ -65,7 +65,10 @@ export const Container = styled.div`
   place-items: center;
   min-width: 320px;
   max-width: 800px;
+  width: 100%;
+  height: 100%;
   min-height: 10vh;
+  max-height: 100%;
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
   background-color: #cc9977;

@@ -111,11 +111,11 @@ func (adventure *Adventure) findAction(actionCode string) (*models.Action, error
 func (adventure *Adventure) changeActionActive(actionCode string, value bool) {
 	action, err := adventure.findAction(actionCode)
 	if err != nil {
+		fmt.Printf("Error finding action: %v %v\n", actionCode, err)
 		return
 	}
 	if action != nil {
-		valueVar := value
-		action.Active = &valueVar
+		action.Active = &value
 	}
 }
 
@@ -453,6 +453,13 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			if err == nil && executable != nil {
 				adventure.ExecuteAction(executable)
 			}
+			if executable.Code == "15" {
+				fmt.Println("ACTION AFTER CHANGE", action.Code, *action.Active)
+				foundAction, err := adventure.findAction("10")
+				if err == nil && foundAction != nil {
+					fmt.Println("ACTIONS ARE EQUAL", &action == &foundAction)
+				}
+			}
 		}
 
 	case models.RANDOM:
@@ -497,6 +504,7 @@ func (adventure *Adventure) Do(actionCode string) error {
 		action = executableAction
 	}
 	err := adventure.ExecuteAction(action)
+	fmt.Println("AFTER EXECUTING ACTION ", action.Code, *action.Active)
 	if err != nil {
 		return fmt.Errorf("error executing action: %s", err.Error())
 	}
