@@ -1,5 +1,10 @@
 import styled, { createGlobalStyle } from 'styled-components'
 
+interface SizeProps {
+  $width?: string
+  $marginLeft?: string
+}
+
 export const devices = {
   mobile: `(max-width: 1023px)`,
   desktop: `(min-width: 1024px)`,
@@ -107,7 +112,7 @@ export const Paragraph = styled.p`
   margin: 1rem 0 0.5rem 0;
 `
 
-export const Label = styled.label`
+export const Label = styled.label<SizeProps>`
   font-size: 1rem;
   margin-left: ${(props) => props.$marginLeft || '1rem'};
   font-weight: 500;
@@ -125,7 +130,7 @@ export const Option = styled.option`
   color: #331111;
   height: 3rem;
 `
-export const Select = styled.select`
+export const Select = styled.select<SizeProps>`
   border-radius: 8px;
   margin-left: ${(props) => props.$marginLeft || '1rem'};
   padding: 0.6rem .6rem .6rem .6rem;
@@ -154,7 +159,7 @@ export const Select = styled.select`
   }
 }
 `
-export const Input = styled.input`
+export const Input = styled.input<SizeProps>`
   border-radius: 8px;
   margin-left: ${(props) => props.$marginLeft || '1rem'};
 
