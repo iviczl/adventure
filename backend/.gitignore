@@ -1,3 +1,5 @@
 db/*
 *.exe
 !db/.gitkeep
+.env
+tmp/*

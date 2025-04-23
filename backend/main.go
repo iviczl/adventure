@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -88,7 +89,7 @@ func init() {
 
 func main() {
 	fmt.Println("Service application launched.", time.Now().Format("2006-01-02 15:04:05"))
-
+	godotenv.Load()
 	shutDownSignals := make(chan os.Signal, 1)
 	signal.Notify(shutDownSignals, syscall.SIGINT, syscall.SIGTERM)
 
@@ -206,7 +207,7 @@ func main() {
 
 	go func() {
 		fmt.Printf("HTTP server is listening on port %v. %v\n", port, time.Now().Format("2006-01-02 15:04:05"))
-		err := engine.Run(fmt.Sprintf("localhost:%v", port)) // listen and serve on 0.0.0.0:8080
+		err := engine.Run(fmt.Sprintf("%s:%v", os.Getenv("HOST"), port)) // listen and serve on 0.0.0.0:8080
 		if err != nil && err != http.ErrServerClosed {
 			fmt.Println("HTTP server error:", err)
 		}
