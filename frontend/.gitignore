@@ -34,3 +34,4 @@ api/Scripts
 
 # python
 __pycache__
+.env
