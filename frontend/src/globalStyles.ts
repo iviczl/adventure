@@ -48,12 +48,12 @@ export const MainContainer = styled.div`
   place-items: center;
   flex-flow: column;
   min-width: 320px;
-  max-width: 600px;
+  max-width: 800px;
   height: 100%;
   max-height: 100%
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
-  padding: 1rem;
+  padding: 2rem;
 `
 export const Container = styled.div`
   box-sizing: inherit;

@@ -184,6 +184,13 @@ func main() {
 			c.JSON(500, gin.H{"error": "Adventure unmarshaling failed. " + err.Error()})
 			return
 		}
+		// Fixing unmarshaling issue with ActualPosition
+		if adventure.ActualPosition != nil {
+			actualPosition := adventureEngine.GetPositionFromPositionList(adventure.Positions, adventure.ActualPosition.Code)
+			if actualPosition != nil {
+				adventure.ActualPosition = actualPosition
+			}
+		}
 		err = adventure.Do(actionCode)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})

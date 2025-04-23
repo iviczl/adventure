@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"text-adventure/models"
@@ -16,9 +15,9 @@ func (adventure *Adventure) executeLeavingActions() {
 		return
 	}
 
-	for _, leavingAction := range adventure.ActualPosition.LeavingActions {
+	for i := range adventure.ActualPosition.LeavingActions {
 		positionCode := adventure.ActualPosition.Code
-		if err := adventure.ExecuteAction(leavingAction); err != nil {
+		if err := adventure.ExecuteAction(adventure.ActualPosition.LeavingActions[i]); err != nil {
 			fmt.Printf("Error executing leaving action: %v\n", err)
 		}
 		// Break if the position code changes
@@ -29,9 +28,9 @@ func (adventure *Adventure) executeLeavingActions() {
 }
 
 func (adventure *Adventure) executeEnteringActions() {
-	for _, enteringAction := range adventure.ActualPosition.EnteringActions {
+	for i := range adventure.ActualPosition.EnteringActions {
 		positionCode := adventure.ActualPosition.Code
-		if err := adventure.ExecuteAction(enteringAction); err != nil {
+		if err := adventure.ExecuteAction(adventure.ActualPosition.EnteringActions[i]); err != nil {
 			fmt.Printf("Error executing entering action: %v\n", err)
 		}
 		// Break if the position code changes
@@ -41,10 +40,10 @@ func (adventure *Adventure) executeEnteringActions() {
 	}
 }
 
-func getPositionFromPositionList(positions []*models.Position, positionCode string) *models.Position {
-	for _, position := range positions {
-		if position.Code == positionCode {
-			return position
+func GetPositionFromPositionList(positions []*models.Position, positionCode string) *models.Position {
+	for i := range positions {
+		if positions[i].Code == positionCode {
+			return positions[i]
 		}
 	}
 	return nil
@@ -56,9 +55,9 @@ func getAction(adventure *Adventure, actionCode string) *models.Action {
 	action := getActionFromPositionList(adventure.Positions, actionCode)
 	if action == nil {
 		// If not found, try to get it from the available actions
-		for _, availableAction := range adventure.AvailableActions {
-			if availableAction.Code == actionCode {
-				return availableAction
+		for i := range adventure.AvailableActions {
+			if adventure.AvailableActions[i].Code == actionCode {
+				return adventure.AvailableActions[i]
 			}
 		}
 	}
@@ -67,8 +66,8 @@ func getAction(adventure *Adventure, actionCode string) *models.Action {
 
 // getActionFromPositionList retrieves an action by its code from a list of positions.
 func getActionFromPositionList(positions []*models.Position, actionCode string) *models.Action {
-	for _, position := range positions {
-		action := getActionFromPosition(position, actionCode)
+	for i := range positions {
+		action := getActionFromPosition(positions[i], actionCode)
 		if action != nil {
 			return action
 		}
@@ -79,21 +78,21 @@ func getActionFromPositionList(positions []*models.Position, actionCode string) 
 // getActionFromPosition retrieves an action by its code from a single position.
 func getActionFromPosition(position *models.Position, actionCode string) *models.Action {
 	// Check available actions
-	for _, action := range position.AvailableActions {
-		if action.Code == actionCode {
-			return action
+	for i := range position.AvailableActions {
+		if position.AvailableActions[i].Code == actionCode {
+			return position.AvailableActions[i]
 		}
 	}
 	// Check entering actions
-	for _, action := range position.EnteringActions {
-		if action.Code == actionCode {
-			return action
+	for i := range position.EnteringActions {
+		if position.EnteringActions[i].Code == actionCode {
+			return position.EnteringActions[i]
 		}
 	}
 	// Check leaving actions
-	for _, action := range position.LeavingActions {
-		if action.Code == actionCode {
-			return action
+	for i := range position.LeavingActions {
+		if position.LeavingActions[i].Code == actionCode {
+			return position.LeavingActions[i]
 		}
 	}
 	return nil
@@ -102,7 +101,7 @@ func getActionFromPosition(position *models.Position, actionCode string) *models
 func (adventure *Adventure) findAction(actionCode string) (*models.Action, error) {
 	action := getAction(adventure, actionCode)
 	if action == nil {
-		return nil, errors.New(fmt.Sprintf("Invalid actionCode %v.", actionCode))
+		return nil, fmt.Errorf("invalid actionCode %v", actionCode)
 	}
 	return action, nil
 }
@@ -144,16 +143,16 @@ func (adventure *Adventure) findItem(itemCode string) (*models.Item, error) {
 // This function needs to be implemented based on your data structure.
 func (adventure *Adventure) getItem(itemCode string) *models.Item {
 	// Check the player's items
-	for _, item := range adventure.Player.Items {
-		if item.Code == itemCode {
-			return item
+	for i := range adventure.Player.Items {
+		if adventure.Player.Items[i].Code == itemCode {
+			return adventure.Player.Items[i]
 		}
 	}
 	// Check the items in the current position
 	if adventure.ActualPosition != nil {
-		for _, item := range adventure.ActualPosition.Items {
-			if item.Code == itemCode {
-				return item
+		for i := range adventure.ActualPosition.Items {
+			if adventure.ActualPosition.Items[i].Code == itemCode {
+				return adventure.ActualPosition.Items[i]
 			}
 		}
 	}
@@ -195,9 +194,9 @@ func popItemFromList(items *[]*models.Item, itemCode string) *models.Item {
 
 // getItemFromPlayer retrieves an item by its code from the player's inventory.
 func getItemFromPlayer(player *models.Player, itemCode string) *models.Item {
-	for _, item := range player.Items {
-		if item.Code == itemCode {
-			return item
+	for i := range player.Items {
+		if player.Items[i].Code == itemCode {
+			return player.Items[i]
 		}
 	}
 	return nil
@@ -205,9 +204,9 @@ func getItemFromPlayer(player *models.Player, itemCode string) *models.Item {
 
 // getItemFromPosition retrieves an item by its code from a single position.
 func getItemFromPosition(position *models.Position, itemCode string) *models.Item {
-	for _, item := range position.Items {
-		if item.Code == itemCode {
-			return item
+	for i := range position.Items {
+		if position.Items[i].Code == itemCode {
+			return position.Items[i]
 		}
 	}
 	return nil
@@ -233,7 +232,7 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 				panic("Missing position code.")
 			}
 			positionCode := condition["positionCode"].(string)
-			position := getPositionFromPositionList(adventure.Positions, positionCode)
+			position := GetPositionFromPositionList(adventure.Positions, positionCode)
 			if position == nil {
 				panic(fmt.Sprintf("Position not found: %s", positionCode))
 			}
@@ -245,7 +244,7 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 			conditionsMet = conditionsMet && !(mustHave.(bool) != hasItem)
 
 		} else if positionCode, ok := condition["positionCode"]; ok {
-			position := getPositionFromPositionList(adventure.Positions, positionCode.(string))
+			position := GetPositionFromPositionList(adventure.Positions, positionCode.(string))
 			if position == nil {
 				panic(fmt.Sprintf("Position not found: %s", positionCode))
 			}
@@ -301,7 +300,7 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 
 // Execute performs the given action on the adventure.
 func (adventure *Adventure) ExecuteAction(action *models.Action) error {
-	fmt.Printf("ACTION EXECUTING %s ACTIVE %t\n", action.Code, *action.Active)
+	fmt.Printf("EXECUTING ACTION %s\n", action.Code)
 
 	if !*action.Active || adventure.Phase == models.ENDED {
 		return nil
@@ -314,7 +313,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 		}
 		// Leaving actions
 		adventure.executeLeavingActions()
-		adventure.ActualPosition = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+		adventure.ActualPosition = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		if adventure.ActualPosition == nil {
 			return fmt.Errorf("position not found: %s", action.PositionCode)
 		}
@@ -329,7 +328,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case models.CHANGE_POSITION_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" {
-			position = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		} else {
 			position = adventure.ActualPosition
 		}
@@ -340,7 +339,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case models.CHANGE_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" {
-			position = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		} else {
 			position = adventure.ActualPosition
 		}
@@ -351,7 +350,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case models.APPEND_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" && action.PositionCode != adventure.ActualPosition.Code {
-			position = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		} else {
 			position = adventure.ActualPosition
 		}
@@ -362,7 +361,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case models.PREPEND_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" && action.PositionCode != adventure.ActualPosition.Code {
-			position = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		} else {
 			position = adventure.ActualPosition
 		}
@@ -374,7 +373,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case models.CHANGE_POSITION_VISITED:
 		var position *models.Position
 		if action.PositionCode != "" {
-			position = getPositionFromPositionList(adventure.Positions, action.PositionCode)
+			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		} else {
 			position = adventure.ActualPosition
 		}
@@ -413,7 +412,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 		if item == nil {
 			return fmt.Errorf("there is no such item at the actual position: %s:%s", adventure.ActualPosition.Code, action.ItemCode)
 		}
-		newPosition := getPositionFromPositionList(adventure.Positions, action.PositionCode)
+		newPosition := GetPositionFromPositionList(adventure.Positions, action.PositionCode)
 		if newPosition == nil {
 			return fmt.Errorf("there is no such position: %s", action.PositionCode)
 		}
@@ -457,7 +456,8 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 				fmt.Println("ACTION AFTER CHANGE", action.Code, *action.Active)
 				foundAction, err := adventure.findAction("10")
 				if err == nil && foundAction != nil {
-					fmt.Println("ACTIONS ARE EQUAL", &action == &foundAction)
+					fmt.Println("FOUND ACTION", foundAction.Code, *foundAction.Active)
+					fmt.Println("ACTIONS ARE EQUAL", action == foundAction)
 				}
 			}
 		}
@@ -492,7 +492,7 @@ func (adventure *Adventure) Start() error {
 }
 
 func (adventure *Adventure) Do(actionCode string) error {
-	action := &models.Action{}
+	var action *models.Action
 	if adventure.ActualPosition != nil {
 		action = getActionFromPosition(adventure.ActualPosition, actionCode)
 	}
@@ -504,7 +504,6 @@ func (adventure *Adventure) Do(actionCode string) error {
 		action = executableAction
 	}
 	err := adventure.ExecuteAction(action)
-	fmt.Println("AFTER EXECUTING ACTION ", action.Code, *action.Active)
 	if err != nil {
 		return fmt.Errorf("error executing action: %s", err.Error())
 	}
