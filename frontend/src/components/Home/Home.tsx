@@ -13,8 +13,9 @@ import {
   Paragraph,
   Option,
   SubHeading,
+  Row,
 } from '../../globalStyles'
-import { Description, Row, StartGrid } from './homeStyles'
+import { Description, StartGrid } from './homeStyles'
 
 export default function Home({ state }: { state: Signal<AppState> }) {
   const [player, setPlayer] = useState('')
@@ -81,7 +82,7 @@ export default function Home({ state }: { state: Signal<AppState> }) {
       </Paragraph>
       <StartGrid>
         {selectedGameId != '' || (
-          <Row>
+          <Row $height='10rem'>
             <Label $width='10rem'>Games to choose from:</Label>
             <Select
               $width='12rem'
@@ -93,7 +94,7 @@ export default function Home({ state }: { state: Signal<AppState> }) {
           </Row>
         )}
         {!selectedGameId || (
-          <div>
+          <>
             <Row>
               <SubHeading>{selectedGameTitle()}</SubHeading>
             </Row>
@@ -105,7 +106,7 @@ export default function Home({ state }: { state: Signal<AppState> }) {
                 Cancel
               </Button>
             </Row>
-          </div>
+          </>
         )}
         <Row>
           <Label $width='10rem'>Player name:</Label>

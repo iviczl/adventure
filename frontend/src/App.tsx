@@ -2,6 +2,7 @@ import { getGames } from './services/gameService'
 import Home from './components/Home/Home'
 import Game from './components/Game/Game'
 import { state } from './state'
+import { MainContainer } from './globalStyles'
 
 function App() {
   async function init() {
@@ -12,10 +13,10 @@ function App() {
   init()
 
   return (
-    <>
+    <MainContainer>
       <Home state={state} />
       <Game state={state} />
-    </>
+    </MainContainer>
   )
 }
 

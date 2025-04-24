@@ -5,6 +5,8 @@ export const Item = styled.option`
   margin: 0.5rem;
   padding: 0.5rem;
   border-radius: 0.8rem;
+  max-width: 100%;
+  text-wrap: wrap;
 
   @media ${devices.mobile} {
     background-color: #aa8866;
@@ -12,6 +14,8 @@ export const Item = styled.option`
   }
 
   @media ${devices.desktop} {
+    background-color: #eeccbb;
+    color: #331111;
     &:hover {
       background-color: #aa8866;
       color: white;

@@ -1,20 +1,16 @@
 import styled from 'styled-components'
 import { devices } from '../../globalStyles'
 
-export const Row = styled.div`
-  padding: 1rem 0;
-  display: flex;
-  flex-wrap: wrap;
-`
 // export const Title = styled.div``
 
 export const Description = styled.div`
   padding: 0;
+  overflow-y: scroll;
+  max-height: 100%;
 
   @media ${devices.mobile} {
     max-width: 246px;
-    max-height: 122px;
-    overflow-y: scroll;
+    // max-height: 122px;
   }
 
   @media ${devices.desktop} {
@@ -27,9 +23,12 @@ export const Description = styled.div`
 `
 
 export const StartGrid = styled.section`
-  margin: 1rem 0 0 0;
-  display: grid;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  // display: grid;
   // grid-template-columns: repeat(auto-fit, clamp(10rem, 15rem, 30rem));
   gap: 1rem;
-  // max-width: 100%;
+  max-width: 100%;
+  max-height: 100%;
 `

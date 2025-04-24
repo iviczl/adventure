@@ -2,9 +2,10 @@ import { Position } from '../../types/position'
 import { Signal } from '@preact/signals-react'
 import { AppState } from '../../state'
 import { takeAction } from '../../services/gameService'
-import { MainContainer } from '../../globalStyles'
+import { Container } from '../../globalStyles'
 import { Item } from './gameStyles'
 import { useState } from 'react'
+import { Row } from '../../globalStyles'
 
 const Game = ({ state }: { state: Signal<AppState> }) => {
   const position = state.value.actualPosition as Position
@@ -28,9 +29,9 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
   }
 
   return (
-    <MainContainer>
+    <Container>
       <p>{position.description}</p>
-      <section>
+      <Row>
         {position.availableActions.map((a) => (
           <Item
             key={a.code}
@@ -45,7 +46,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
             Home
           </Item>
         )}
-      </section>
+      </Row>
       {/* <section>
         {position.items.map((i) => (
           <Item
@@ -57,7 +58,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
           </Item>
         ))}
       </section> */}
-    </MainContainer>
+    </Container>
   )
 }
 

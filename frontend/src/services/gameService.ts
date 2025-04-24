@@ -6,7 +6,7 @@ let abortController: AbortController
 const portExpression = import.meta.env.VITE_SERVICE_PORT
   ? `:${import.meta.env.VITE_SERVICE_PORT}`
   : ''
-const apiBasePath = import.meta.env.VITE_SERVICE_HOST + ':' + portExpression
+const apiBasePath = import.meta.env.VITE_SERVICE_HOST + portExpression
 
 export async function getGames() {
   abortController = new AbortController()
@@ -69,7 +69,7 @@ export async function takeAction(
   }
 }
 
-function assertError(result: { response: Promise<any>; error: unknown }) {
+function assertError(result: { response: Promise<Position>; error: unknown }) {
   if (!result.response) {
     console.log(result.error)
     return true

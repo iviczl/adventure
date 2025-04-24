@@ -1,7 +1,8 @@
 import styled, { createGlobalStyle } from 'styled-components'
 
-interface SizeProps {
+export interface SizeProps {
   $width?: string
+  $height?: string
   $marginLeft?: string
 }
 
@@ -24,7 +25,8 @@ const GlobalStyle = createGlobalStyle`
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: auto;
+  padding: 0;
+  margin: 0;
 }
 
 #root {
@@ -47,20 +49,22 @@ export const SubHeading = styled.h5`
 `
 export const MainContainer = styled.div`
   box-sizing: inherit;
-  margin: auto;
+  margin: 0;
   background-color: #cc9977;
   display: flex;
   place-items: center;
   flex-flow: column;
   min-width: 320px;
-  max-width: 800px;
-  height: 100%;
-  max-height: 100%
+  max-width: 100%;
+  width: 100%;
+  height: 100vh;
+  max-height: 100%;
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
-  padding: 2rem;
+  overflow-y: auto;
+  // padding: 2rem;
 `
-export const Container = styled.div`
+export const Container = styled.div<SizeProps>`
   box-sizing: inherit;
   margin-left: auto;
   margin-right: auto;
@@ -68,21 +72,31 @@ export const Container = styled.div`
   display: flex;
   flex-flow: column;
   place-items: center;
+  gap: 1rem;
   min-width: 320px;
   max-width: 800px;
-  width: 100%;
-  height: 100%;
+  width: ${(props) => props.$width || '100%'};
+  height: ${(props) => props.$height || '100%'};
   min-height: 10vh;
   max-height: 100%;
-  border: solid 1px #331111;
+  // border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
   background-color: #cc9977;
 `
+export const Row = styled.div<SizeProps>`
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: ${(props) => props.$width || 'unset'};
+  height: ${(props) => props.$height || 'unset'};
+  max-width: 100%;
+`
+
 export const Button = styled.button`
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
   background-color: #eeccbb;
