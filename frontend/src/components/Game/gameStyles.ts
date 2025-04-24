@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 import { devices } from '../../globalStyles'
 
-export const Item = styled.option`
+export const Item = styled.button`
   margin: 0.5rem;
   padding: 0.5rem;
+  border: none;
   border-radius: 0.8rem;
   max-width: 100%;
   text-wrap: wrap;
