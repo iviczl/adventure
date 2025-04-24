@@ -110,7 +110,7 @@ func main() {
 	fmt.Println("Initializing HTTP server...")
 	// store := cookie.NewStore([]byte("secret"))
 	store := memstore.NewStore([]byte("secret"))
-	store.Options(sessions.Options{MaxAge: 0, SameSite: http.SameSiteNoneMode, Secure: true})
+	store.Options(sessions.Options{MaxAge: 0, SameSite: http.SameSiteLaxMode, Secure: true, HttpOnly: true, Domain: os.Getenv("ALLOWED_ORIGIN")})
 	engine := gin.Default()
 	engine.Use(CorsMiddleware())
 	engine.Use(sessions.Sessions("session", store))
