@@ -3,8 +3,10 @@ import { state } from '../state'
 import { GameInfo } from '../types/gameInfo'
 
 let abortController: AbortController
-const apiBasePath =
-  import.meta.env.VITE_SERVICE_HOST + ':' + import.meta.env.VITE_SERVICE_PORT
+const portExpression = import.meta.env.VITE_SERVICE_PORT
+  ? `:${import.meta.env.VITE_SERVICE_PORT}`
+  : ''
+const apiBasePath = import.meta.env.VITE_SERVICE_HOST + ':' + portExpression
 
 export async function getGames() {
   abortController = new AbortController()
