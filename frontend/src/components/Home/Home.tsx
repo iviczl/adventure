@@ -82,8 +82,8 @@ export default function Home({ state }: { state: Signal<AppState> }) {
       </Paragraph>
       <StartGrid>
         {selectedGameId != '' || (
-          <Row $height='10rem'>
-            <Label $width='10rem'>Games to choose from:</Label>
+          <Row>
+            <Label $width='100%'>Games to choose from:</Label>
             <Select
               $width='12rem'
               onChange={(e) => setSelectedGameId(e.target.value)}
