@@ -12,12 +12,9 @@ import (
 	"text-adventure/utils"
 	"time"
 
-	"github.com/gin-contrib/sessions"
-	// "github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-contrib/sessions/memstore"
+	sessionHandler "github.com/gorilla/sessions"
 
 	"encoding/gob"
-	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -26,35 +23,6 @@ import (
 )
 
 var port = 8080
-
-// func headers(w http.ResponseWriter, req *http.Request) {
-// 	for name, headers := range req.Header {
-// 		for _, h := range headers {
-// 			fmt.Fprintf(w, "%v: %v\n", name, h)
-// 		}
-// 	}
-// }
-
-// type ListenHandler struct{}
-
-// func (a *ListenHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-// 	defer fmt.Println("Server has exited.")
-// 	ctx := req.Context()
-// 	<-ctx.Done()
-// 	err := ctx.Err()
-// 	fmt.Println("server:", err)
-// 	internalError := http.StatusInternalServerError
-// 	http.Error(w, err.Error(), internalError)
-// }
-
-// func main() {
-// 	fmt.Println("Initializing routing...")
-// 	http.HandleFunc("/headers", headers)
-// 	fmt.Println("Routing initialized.")
-
-// 	fmt.Printf("Server is listening on port %v.\n", port)
-// 	http.ListenAndServe(fmt.Sprintf(":%v", port), &ListenHandler{})
-// }
 
 func headers(c *gin.Context) {
 	headerMap := gin.H{}
@@ -83,7 +51,11 @@ func CorsMiddleware() gin.HandlerFunc {
 }
 
 func init() {
-	gob.Register(adventureEngine.Adventure{})
+	gob.Register(&adventureEngine.Adventure{})
+	gob.Register(&models.Position{})
+	gob.Register(&models.Action{})
+	gob.Register(&models.Item{})
+	gob.Register(&models.Player{})
 	gob.Register(make(map[string]interface{}))
 }
 
@@ -108,21 +80,22 @@ func main() {
 	}
 	fmt.Println("Database client initialized.")
 	fmt.Println("Initializing HTTP server...")
-	// store := cookie.NewStore([]byte("secret"))
-	store := memstore.NewStore([]byte("secret"))
-	store.Options(sessions.Options{MaxAge: 0, SameSite: http.SameSiteLaxMode, Secure: true, HttpOnly: true, Domain: os.Getenv("ALLOWED_ORIGIN")})
+	store := utils.NewInMemoryStore([]byte("WYVOEWXHLUDB34DAELL2LDYNJSLEZT5WZRLPLHIQE5JXOGYCGIZQ"))
+	store.Options = &sessionHandler.Options{
+		MaxAge:   86400 * 30,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
+		HttpOnly: true,
+		// Domain:      os.Getenv("ALLOWED_ORIGIN"),
+		Partitioned: true,
+	}
 	engine := gin.Default()
 	engine.Use(CorsMiddleware())
-	engine.Use(sessions.Sessions("session", store))
-
-	engine.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
 
 	engine.GET("/games", func(c *gin.Context) { c.JSON(200, utils.AdventureInfos()) })
+
 	engine.GET("/headers", headers)
+
 	engine.POST("/new", func(c *gin.Context) {
 		body, err := utils.RequestBody(c)
 		if err != nil {
@@ -148,14 +121,23 @@ func main() {
 			temporaryDescription = adventure.ActualPosition.TemporaryDescription
 			adventure.ActualPosition.TemporaryDescription = ""
 		}
-		session := sessions.Default(c)
+		session, err := store.Get(c.Request, "session") //sessions.Default(c)
+		if err != nil {
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		db.Create(adventure)
 		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
 		actualPosition.Description = temporaryDescription
-		value, _ := json.Marshal(adventure)
-		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), value)
+		session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)] = adventure
 		fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", player, adventure.Id))
-		session.Save()
+		fmt.Println(session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)])
+		err = session.Save(c.Request, c.Writer)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		fmt.Println("Session ID:(", session.ID, ")", len(session.ID))
 		c.JSON(200, actualPosition)
 	})
 
@@ -172,17 +154,21 @@ func main() {
 			c.JSON(400, gin.H{"error": "Missing required parameters"})
 			return
 		}
-		session := sessions.Default(c)
-		adventureValue := session.Get(fmt.Sprintf("%v:%v", player, adventureId))
+		session, err := store.Get(c.Request, "session")
+		if err != nil {
+			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		adventureValue := session.Values[fmt.Sprintf("%v:%v", player, adventureId)]
 		fmt.Println("Session entry key:", fmt.Sprintf("%v:%v", player, adventureId))
 		if adventureValue == nil {
 			c.JSON(404, gin.H{"error": "Adventure not found"})
 			return
 		}
 		adventure := &adventureEngine.Adventure{}
-		err = json.Unmarshal(adventureValue.([]byte), &adventure)
-		if err != nil {
-			c.JSON(500, gin.H{"error": "Adventure unmarshaling failed. " + err.Error()})
+		adventure, ok := adventureValue.(*adventureEngine.Adventure)
+		if !ok {
+			c.JSON(500, gin.H{"error": "Adventure unmarshaling failed. "})
 			return
 		}
 		// Fixing unmarshaling issue with ActualPosition
@@ -198,10 +184,12 @@ func main() {
 			return
 		}
 		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
-		value, _ := json.Marshal(adventure)
-		session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), value)
-		// session.Set(fmt.Sprintf("%v:%v", player, adventure.Id), adventure)
-		session.Save()
+		session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)] = adventure
+		err = session.Save(c.Request, c.Writer)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(200, actualPosition)
 	})
 

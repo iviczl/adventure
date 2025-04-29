@@ -48,9 +48,10 @@ func AdjustedActualPosition(p *Position) *Position {
 		p.TemporaryDescription = ""
 	}
 	availableActions := slices.Collect(func(yield func(*Action) bool) {
-		for _, a := range p.AvailableActions {
-			if *a.Active && *a.Visible {
-				if !yield(a) {
+		for i := range p.AvailableActions {
+			action := p.AvailableActions[i]
+			if *action.Active && action.Visible != nil && *action.Visible {
+				if !yield(action) {
 					return
 				}
 			}
