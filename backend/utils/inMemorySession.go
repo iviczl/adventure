@@ -60,7 +60,7 @@ func (store *InMemoryStore) Get(r *http.Request, name string) (*sessions.Session
 	if !exists {
 		// Create a new session if it doesn't exist
 		session = sessions.NewSession(store, name)
-		session.Options.MaxAge = store.Options.MaxAge
+		session.Options = store.Options
 		store.sessions[name] = session
 	}
 	return session, nil

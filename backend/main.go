@@ -9,12 +9,15 @@ import (
 	"syscall"
 	adventureEngine "text-adventure/engine"
 	"text-adventure/models"
+	"text-adventure/models/dbmodels"
 	"text-adventure/utils"
 	"time"
 
 	sessionHandler "github.com/gorilla/sessions"
 
 	"encoding/gob"
+
+	"bytes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -73,11 +76,17 @@ func main() {
 	}
 
 	// Migrate the schema (create tables, etc.)
-	err = db.AutoMigrate(&models.Item{}, &models.Player{}, &models.Action{}, &models.Position{}, &models.Adventure{})
+	err = db.AutoMigrate(&dbmodels.User{}, &dbmodels.Play{})
 	if err != nil {
 		fmt.Println("Failed to migrate the database:", err)
 		return
 	}
+	// user := dbmodels.User{UserName: "admin", Email: "admin@admin.com", Password: "admin", RegistrationCode: "sasa"}
+	// result := db.Create(&user)
+	// if result.Error != nil {
+	// 	fmt.Println("Failed to create user:", result.Error)
+	// 	return
+	// }
 	fmt.Println("Database client initialized.")
 	fmt.Println("Initializing HTTP server...")
 	store := utils.NewInMemoryStore([]byte("WYVOEWXHLUDB34DAELL2LDYNJSLEZT5WZRLPLHIQE5JXOGYCGIZQ"))
@@ -116,19 +125,33 @@ func main() {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
-		temporaryDescription := ""
-		if adventure.ActualPosition.TemporaryDescription != "" {
-			temporaryDescription = adventure.ActualPosition.TemporaryDescription
-			adventure.ActualPosition.TemporaryDescription = ""
-		}
-		session, err := store.Get(c.Request, "session") //sessions.Default(c)
+		// temporaryDescription := ""
+		// if adventure.ActualPosition.TemporaryDescription != "" {
+		// 	temporaryDescription = adventure.ActualPosition.TemporaryDescription
+		// 	adventure.ActualPosition.TemporaryDescription = ""
+		// }
+		session, err := store.Get(c.Request, "session")
 		if err != nil {
 			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		db.Create(adventure)
+		var serialized bytes.Buffer
+		encoder := gob.NewEncoder(&serialized)
+		err = encoder.Encode(&adventure)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		user := &dbmodels.User{}
+		db.Where("user_name = ?", player).First(user)
+		play := dbmodels.Play{UserId: user.Id, AdventureTitle: adventure.Title, Adventure: serialized.Bytes()}
+		result := db.Create(&play)
+		if result.Error != nil {
+			fmt.Println("Failed to create a play:", result.Error)
+			return
+		}
 		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
-		actualPosition.Description = temporaryDescription
+		// actualPosition.Description = temporaryDescription
 		session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)] = adventure
 		fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", player, adventure.Id))
 		fmt.Println(session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)])
@@ -172,12 +195,12 @@ func main() {
 			return
 		}
 		// Fixing unmarshaling issue with ActualPosition
-		if adventure.ActualPosition != nil {
-			actualPosition := adventureEngine.GetPositionFromPositionList(adventure.Positions, adventure.ActualPosition.Code)
-			if actualPosition != nil {
-				adventure.ActualPosition = actualPosition
-			}
-		}
+		// if adventure.ActualPosition != nil {
+		// 	actualPosition := adventureEngine.GetPositionFromPositionList(adventure.Positions, adventure.ActualPosition.Code)
+		// 	if actualPosition != nil {
+		// 		adventure.ActualPosition = actualPosition
+		// 	}
+		// }
 		err = adventure.Do(actionCode)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
