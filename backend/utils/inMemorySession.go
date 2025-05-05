@@ -55,27 +55,38 @@ func (store *InMemoryStore) Get(r *http.Request, name string) (*sessions.Session
 	}
 	store.mu.RLock()
 	defer store.mu.RUnlock()
+	cookie, err := r.Cookie(name)
+	var session *sessions.Session
+	if err != nil {
+		return nil, fmt.Errorf("sessions: missing cookie: %s", err.Error())
+	}
+	exists := false
+	for j := range store.sessions {
+		encoded, err := securecookie.EncodeMulti(store.sessions[j].Name(), store.sessions[j].ID, store.Codecs...)
+		if err != nil {
+			return nil, fmt.Errorf("sessions: invalid session content: %s", err.Error())
+		}
 
-	session, exists := store.sessions[name]
+		if cookie.Name == encoded {
+		}
+		exists = true
+		session = store.sessions[j]
+	}
 	if !exists {
 		// Create a new session if it doesn't exist
 		session = sessions.NewSession(store, name)
 		session.Options = store.Options
-		store.sessions[name] = session
 	}
 	return session, nil
 }
 
-// New creates a new session.
+// New creates a new session
 func (store *InMemoryStore) New(r *http.Request, name string) (*sessions.Session, error) {
 	if !isCookieNameValid(name) {
 		return nil, fmt.Errorf("sessions: invalid character in cookie name: %s", name)
 	}
-	store.mu.Lock()
-	defer store.mu.Unlock()
-
 	session := sessions.NewSession(store, name)
-	store.sessions[name] = session
+	session.Options = store.Options
 	return session, nil
 }
 

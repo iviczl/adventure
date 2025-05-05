@@ -130,7 +130,7 @@ func main() {
 		// 	temporaryDescription = adventure.ActualPosition.TemporaryDescription
 		// 	adventure.ActualPosition.TemporaryDescription = ""
 		// }
-		session, err := store.Get(c.Request, "session")
+		session, err := store.New(c.Request, "session")
 		if err != nil {
 			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 			return
