@@ -24,8 +24,9 @@ func Login(c *gin.Context) {
 
 	// Check user credentials
 	var user *dbmodels.User
+	zeroUser := &dbmodels.User{}
 	utils.DbClient.Where(&dbmodels.User{UserName: userName, Password: password}).First(&user)
-	if user == nil {
+	if user.Id == zeroUser.Id {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}

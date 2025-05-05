@@ -89,7 +89,7 @@ export async function takeAction(
 }
 
 function assertError(result: { response: Promise<Position>; error: unknown }) {
-  if (!result.response) {
+  if (result.error) {
     console.log(result.error)
     return true
   }
