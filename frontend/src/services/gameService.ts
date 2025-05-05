@@ -1,12 +1,31 @@
 import { Position } from '../types/position'
 import { state } from '../state'
 import { GameInfo } from '../types/gameInfo'
+import { LoginResponse } from '../types/loginResponse'
 
 let abortController: AbortController
 const portExpression = import.meta.env.VITE_SERVICE_PORT
   ? `:${import.meta.env.VITE_SERVICE_PORT}`
   : ''
 const apiBasePath = import.meta.env.VITE_SERVICE_HOST + portExpression
+
+export async function login(userName: string, password: string) {
+  abortController = new AbortController()
+  const result = await doFetch(`${apiBasePath}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userName, password }),
+  })
+  if (assertError(result)) {
+    return
+  }
+  const response = (await result.response) as LoginResponse
+  state.value = {
+    ...state.value,
+    userName,
+    token: response.token,
+  }
+}
 
 export async function getGames() {
   abortController = new AbortController()
@@ -77,10 +96,16 @@ function assertError(result: { response: Promise<Position>; error: unknown }) {
   return false
 }
 
-export async function doFetch(url: string, options = {}) {
+export async function doFetch(url: string, options = {} as RequestInit) {
   let response = null
   let error = null
   try {
+    if (state.value.token) {
+      options.headers = {
+        ...options.headers,
+        Authorization: state.value.token,
+      }
+    }
     const signal = abortController.signal
     const res = await fetch(url, { ...options, credentials: 'include', signal })
     response = await res.json()

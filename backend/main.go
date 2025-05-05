@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	adventureEngine "text-adventure/engine"
 	"text-adventure/models"
@@ -19,10 +18,10 @@ import (
 
 	"bytes"
 
+	"text-adventure/middlewares"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 var port = 8080
@@ -69,9 +68,8 @@ func main() {
 	signal.Notify(shutDownSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	fmt.Println("Initializing database client...")
-	db, err := gorm.Open(sqlite.Open(filepath.Join(".", "db", "text-adventure.db")), &gorm.Config{})
+	db, err := utils.CreateDbClient()
 	if err != nil {
-		fmt.Println("Failed to connect to the database:", err)
 		return
 	}
 
@@ -100,11 +98,10 @@ func main() {
 	}
 	engine := gin.Default()
 	engine.Use(CorsMiddleware())
-
+	engine.POST("/login", middlewares.Login)
 	engine.GET("/games", func(c *gin.Context) { c.JSON(200, utils.AdventureInfos()) })
-
+	engine.Use(middlewares.Authentication())
 	engine.GET("/headers", headers)
-
 	engine.POST("/new", func(c *gin.Context) {
 		body, err := utils.RequestBody(c)
 		if err != nil {

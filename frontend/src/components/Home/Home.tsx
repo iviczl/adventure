@@ -66,7 +66,7 @@ export default function Home({ state }: { state: Signal<AppState> }) {
     return ''
   }
 
-  if (state.value.selectedGameId) {
+  if (state.value.userName === '' || state.value.selectedGameId) {
     return null
   }
 

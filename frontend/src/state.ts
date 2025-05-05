@@ -3,6 +3,8 @@ import { GameInfo } from './types/gameInfo'
 import { Position } from './types/position'
 
 export type AppState = {
+  userName: string
+  token: string | undefined
   player: string
   games: GameInfo[] | undefined
   selectedGameId: string
@@ -11,6 +13,8 @@ export type AppState = {
 }
 
 export const state = signal({
+  userName: '',
+  token: undefined,
   player: '',
   games: undefined,
   selectedGameId: '',
