@@ -16,12 +16,15 @@ import {
   Row,
 } from '../../globalStyles'
 import { Description, StartGrid } from './homeStyles'
+import TabSelect from '../TabSelect/TabSelect'
+import Tab from '../TabSelect/Tab'
 
 export default function Home({ state }: { state: Signal<AppState> }) {
   const [player, setPlayer] = useState('')
   const [selectedGameId, setSelectedGameId] = useState(
     state.value.selectedGameId
   )
+  const [selectedTab, setSelectedTab] = useState('existing')
   const [requestProcessing, setRequestProcessing] = useState(false)
 
   useEffect(() => {
@@ -37,6 +40,7 @@ export default function Home({ state }: { state: Signal<AppState> }) {
     await startGame(selectedGameId, player)
     setRequestProcessing(false)
   }
+  async function continuePlay() {}
 
   function cancel() {
     setSelectedGameId('')
@@ -66,6 +70,10 @@ export default function Home({ state }: { state: Signal<AppState> }) {
     return ''
   }
 
+  function selectTab(id: string) {
+    setSelectedTab(id)
+  }
+
   if (state.value.userName === '' || state.value.selectedGameId) {
     return null
   }
@@ -75,57 +83,100 @@ export default function Home({ state }: { state: Signal<AppState> }) {
   }
 
   return (
-    <Container>
+    <>
       <MainHeading>Adventure games</MainHeading>
-      <Paragraph>
-        Select a game, state your name and press Start to begin.
-      </Paragraph>
-      <StartGrid>
-        {selectedGameId != '' || (
-          <Row>
-            <Label $width='100%'>Games to choose from:</Label>
-            <Select
-              $width='12rem'
-              onChange={(e) => setSelectedGameId(e.target.value)}
-            >
-              <Option value=''>(Select an option)</Option>
-              {state.value.games && state.value.games.map(gameItem)}
-            </Select>
-          </Row>
-        )}
-        {!selectedGameId || (
-          <>
+      <TabSelect>
+        <Tab
+          id='saved'
+          title='Saved Gameplays'
+          selectedId={selectedTab}
+          onClick={selectTab}
+        />
+        <Tab
+          id='new'
+          title='New Game'
+          selectedId={selectedTab}
+          onClick={selectTab}
+        />
+      </TabSelect>
+      {selectedTab === 'saved' ? (
+        <Container>
+          <Paragraph>Select a gameplay and press Continue to begin.</Paragraph>
+          <StartGrid>
             <Row>
-              <SubHeading>{selectedGameTitle()}</SubHeading>
+              <Label $width='100%'>Gameplays to choose from:</Label>
+              <Select
+                $width='12rem'
+                onChange={(e) => setSelectedGameId(e.target.value)}
+              >
+                <Option value=''>(Select an option)</Option>
+                {state.value.games && state.value.games.map(gameItem)}
+              </Select>
             </Row>
             <Row>
-              <Description>{selectedGameDescription()}</Description>
-            </Row>
-            <Row>
-              <Button onClick={cancel} disabled={requestProcessing}>
-                Cancel
+              <Button
+                onClick={() => continuePlay()}
+                disabled={requestProcessing}
+              >
+                Continue
               </Button>
             </Row>
-          </>
-        )}
-        <Row>
-          <Label $width='10rem'>Player name:</Label>
-          <Input
-            $width='12rem'
-            type='text'
-            onChange={(e) => setPlayer(e.target.value)}
-            value={player}
-          />
-        </Row>
-      </StartGrid>
-      <Row>
-        <Button
-          onClick={start}
-          disabled={!selectedGameId || !player || requestProcessing}
-        >
-          Start
-        </Button>
-      </Row>
-    </Container>
+          </StartGrid>
+        </Container>
+      ) : null}
+      {selectedTab === 'new' ? (
+        <Container>
+          <Paragraph>
+            Select a game, state your name and press Start to begin.
+          </Paragraph>
+          <StartGrid>
+            {selectedGameId != '' || (
+              <Row>
+                <Label $width='100%'>Games to choose from:</Label>
+                <Select
+                  $width='12rem'
+                  onChange={(e) => setSelectedGameId(e.target.value)}
+                >
+                  <Option value=''>(Select an option)</Option>
+                  {state.value.games && state.value.games.map(gameItem)}
+                </Select>
+              </Row>
+            )}
+            {!selectedGameId || (
+              <>
+                <Row>
+                  <SubHeading>{selectedGameTitle()}</SubHeading>
+                </Row>
+                <Row>
+                  <Description>{selectedGameDescription()}</Description>
+                </Row>
+                <Row>
+                  <Button onClick={cancel} disabled={requestProcessing}>
+                    Cancel
+                  </Button>
+                </Row>
+              </>
+            )}
+            <Row>
+              <Label $width='10rem'>Player name:</Label>
+              <Input
+                $width='12rem'
+                type='text'
+                onChange={(e) => setPlayer(e.target.value)}
+                value={player}
+              />
+            </Row>
+          </StartGrid>
+          <Row>
+            <Button
+              onClick={start}
+              disabled={!selectedGameId || !player || requestProcessing}
+            >
+              Start
+            </Button>
+          </Row>
+        </Container>
+      ) : null}
+    </>
   )
 }

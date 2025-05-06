@@ -13,6 +13,10 @@ export interface SizeProps {
   $paddingBottom?: string
 }
 
+export interface ContainerProps extends SizeProps {
+  $visible?: boolean
+}
+
 export const devices = {
   mobile: `(max-width: 1023px)`,
   desktop: `(min-width: 1024px)`,
@@ -71,7 +75,13 @@ export const MainContainer = styled.div`
   // overflow-y: auto;
   // padding: 2rem;
 `
-export const Container = styled.div<SizeProps>`
+export const Container = styled.div<ContainerProps>`
+  visibility: ${(props) =>
+    props.$visible === undefined
+      ? 'visible'
+      : props.$visible
+      ? 'visible'
+      : 'hidden'};
   box-sizing: inherit;
   margin-left: auto;
   margin-right: auto;
