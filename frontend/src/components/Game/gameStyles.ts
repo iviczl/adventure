@@ -24,3 +24,24 @@ export const Item = styled.button`
     }
   }
 `
+export const ColumnContainer = styled.section`
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 100%;
+  max-height: 100%;
+`
+export const ToolHeadBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  // align-items: right;
+  margin: 1rem;
+  padding-bottom: 0.5rem;
+  width:  calc(100%-2rem);
+  max-width: calc(100%-2rem);
+  border-bottom: solid 1px #331111;
+  background-color: #cc9977;
+  color: #331111;
+}`

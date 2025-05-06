@@ -3,9 +3,10 @@ import { Signal } from '@preact/signals-react'
 import { AppState } from '../../state'
 import { takeAction } from '../../services/gameService'
 import { Container } from '../../globalStyles'
-import { Item } from './gameStyles'
+import { ColumnContainer, Item } from './gameStyles'
 import { useState } from 'react'
 import { Row } from '../../globalStyles'
+import ToolBar from './ToolBar'
 
 const Game = ({ state }: { state: Signal<AppState> }) => {
   const position = state.value.actualPosition as Position
@@ -29,25 +30,27 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
   }
 
   return (
-    <Container>
-      <p>{position.description}</p>
-      <Row>
-        {position.availableActions.map((a) => (
-          <Item
-            key={a.code}
-            onClick={() => callAction(a.code)}
-            disabled={requestProcessing}
-          >
-            {a.description}
-          </Item>
-        ))}
-        {!position.endPosition || (
-          <Item onClick={home} disabled={requestProcessing}>
-            Home
-          </Item>
-        )}
-      </Row>
-      {/* <section>
+    <ColumnContainer>
+      <ToolBar />
+      <Container $paddingTop='0'>
+        <p>{position.description}</p>
+        <Row>
+          {position.availableActions.map((a) => (
+            <Item
+              key={a.code}
+              onClick={() => callAction(a.code)}
+              disabled={requestProcessing}
+            >
+              {a.description}
+            </Item>
+          ))}
+          {!position.endPosition || (
+            <Item onClick={home} disabled={requestProcessing}>
+              Home
+            </Item>
+          )}
+        </Row>
+        {/* <section>
         {position.items.map((i) => (
           <Item
             key={i.id}
@@ -58,7 +61,8 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
           </Item>
         ))}
       </section> */}
-    </Container>
+      </Container>
+    </ColumnContainer>
   )
 }
 

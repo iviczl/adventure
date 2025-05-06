@@ -4,6 +4,13 @@ export interface SizeProps {
   $width?: string
   $height?: string
   $marginLeft?: string
+  $marginRight?: string
+  $marginTop?: string
+  $marginBottom?: string
+  $paddingLeft?: string
+  $paddingRight?: string
+  $paddingTop?: string
+  $paddingBottom?: string
 }
 
 export const devices = {
@@ -61,14 +68,17 @@ export const MainContainer = styled.div`
   max-height: 100%;
   border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
-  overflow-y: auto;
+  // overflow-y: auto;
   // padding: 2rem;
 `
 export const Container = styled.div<SizeProps>`
   box-sizing: inherit;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rem;
+  padding-top: ${(props) => props.$paddingTop || '2rem'};
+  padding-bottom: ${(props) => props.$paddingBottom || '2rem'};
+  padding-left: ${(props) => props.$paddingLeft || '2rem'};
+  padding-right: ${(props) => props.$paddingRight || '2rem'};
   display: flex;
   flex-flow: column;
   place-items: center;
@@ -79,6 +89,7 @@ export const Container = styled.div<SizeProps>`
   height: ${(props) => props.$height || '100%'};
   min-height: 10vh;
   max-height: 100%;
+  overflow-y: auto;
   // border: solid 1px #331111;
   border-radius: clamp(5px, 20px, 25px);
   background-color: #cc9977;

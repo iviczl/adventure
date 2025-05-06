@@ -9,6 +9,19 @@ const portExpression = import.meta.env.VITE_SERVICE_PORT
   : ''
 const apiBasePath = import.meta.env.VITE_SERVICE_HOST + portExpression
 
+export async function save() {
+  abortController = new AbortController()
+  const result = await doFetch(`${apiBasePath}/save`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ adventureId: state.value.adventureId }),
+  })
+  if (assertError(result)) {
+    return false
+  }
+  return true
+}
+
 export async function login(userName: string, password: string) {
   abortController = new AbortController()
   const result = await doFetch(`${apiBasePath}/login`, {

@@ -8,6 +8,10 @@ import (
 
 type Guid uuid.UUID
 
+func ZeroGuid() Guid {
+	return Guid(uuid.UUID{})
+}
+
 // StringToGuid -> parse string to Guid
 func StringToGuid(s string) (Guid, error) {
 	id, err := uuid.Parse(s)

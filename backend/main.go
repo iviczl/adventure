@@ -6,17 +6,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	adventureEngine "text-adventure/engine"
+	"text-adventure/constants"
+	"text-adventure/engine"
 	"text-adventure/models"
-	"text-adventure/models/dbmodels"
-	"text-adventure/utils"
+	"text-adventure/routes"
 	"time"
 
-	sessionHandler "github.com/gorilla/sessions"
-
 	"encoding/gob"
-
-	"bytes"
 
 	"text-adventure/middlewares"
 
@@ -25,16 +21,6 @@ import (
 )
 
 var port = 8080
-
-func headers(c *gin.Context) {
-	headerMap := gin.H{}
-	for name, headers := range c.Request.Header {
-		for _, h := range headers {
-			headerMap[name] = h
-		}
-	}
-	c.JSON(200, headerMap)
-}
 
 func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -53,7 +39,7 @@ func CorsMiddleware() gin.HandlerFunc {
 }
 
 func init() {
-	gob.Register(&adventureEngine.Adventure{})
+	gob.Register(&engine.Adventure{})
 	gob.Register(&models.Position{})
 	gob.Register(&models.Action{})
 	gob.Register(&models.Item{})
@@ -68,150 +54,23 @@ func main() {
 	signal.Notify(shutDownSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	fmt.Println("Initializing database client...")
-	db, err := utils.CreateDbClient()
-	if err != nil {
-		return
-	}
+	constants.InitDbClient()
 
-	// Migrate the schema (create tables, etc.)
-	err = db.AutoMigrate(&dbmodels.User{}, &dbmodels.Play{})
-	if err != nil {
-		fmt.Println("Failed to migrate the database:", err)
-		return
-	}
-	// user := dbmodels.User{UserName: "admin", Email: "admin@admin.com", Password: "admin", RegistrationCode: "sasa"}
-	// result := db.Create(&user)
-	// if result.Error != nil {
-	// 	fmt.Println("Failed to create user:", result.Error)
-	// 	return
-	// }
 	fmt.Println("Database client initialized.")
 	fmt.Println("Initializing HTTP server...")
-	store := utils.NewInMemoryStore([]byte("WYVOEWXHLUDB34DAELL2LDYNJSLEZT5WZRLPLHIQE5JXOGYCGIZQ"))
-	store.Options = &sessionHandler.Options{
-		MaxAge:   86400 * 30,
-		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
-		HttpOnly: true,
-		// Domain:      os.Getenv("ALLOWED_ORIGIN"),
-		Partitioned: true,
-	}
+	constants.InitSessionStore()
 	engine := gin.Default()
+
 	engine.Use(CorsMiddleware())
-	engine.POST("/login", middlewares.Login)
-	engine.GET("/games", func(c *gin.Context) { c.JSON(200, utils.AdventureInfos()) })
+
+	engine.POST("/login", routes.Login)
+	engine.GET("/games", routes.Games)
+
 	engine.Use(middlewares.Authentication())
-	engine.GET("/headers", headers)
-	engine.POST("/new", func(c *gin.Context) {
-		body, err := utils.RequestBody(c)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		player := body["player"].(string)
-		adventureCode := body["gameId"].(string)
 
-		adventure, err := utils.Load(adventureCode, nil)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		adventure.Player.Name = player
-		if err := adventure.Start(); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		// temporaryDescription := ""
-		// if adventure.ActualPosition.TemporaryDescription != "" {
-		// 	temporaryDescription = adventure.ActualPosition.TemporaryDescription
-		// 	adventure.ActualPosition.TemporaryDescription = ""
-		// }
-		session, err := store.New(c.Request, "session")
-		if err != nil {
-			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		var serialized bytes.Buffer
-		encoder := gob.NewEncoder(&serialized)
-		err = encoder.Encode(&adventure)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		user := &dbmodels.User{}
-		db.Where("user_name = ?", player).First(user)
-		play := dbmodels.Play{UserId: user.Id, AdventureTitle: adventure.Title, Adventure: serialized.Bytes()}
-		result := db.Create(&play)
-		if result.Error != nil {
-			fmt.Println("Failed to create a play:", result.Error)
-			return
-		}
-		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
-		// actualPosition.Description = temporaryDescription
-		session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)] = adventure
-		fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", player, adventure.Id))
-		fmt.Println(session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)])
-		err = session.Save(c.Request, c.Writer)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		fmt.Println("Session ID:(", session.ID, ")", len(session.ID))
-		c.JSON(200, actualPosition)
-	})
-
-	engine.POST("/do", func(c *gin.Context) {
-		body, err := utils.RequestBody(c)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		player := body["player"].(string)
-		adventureId := body["adventureId"].(string)
-		actionCode := body["actionCode"].(string)
-		if player == "" || adventureId == "" || actionCode == "" {
-			c.JSON(400, gin.H{"error": "Missing required parameters"})
-			return
-		}
-		session, err := store.Get(c.Request, "session")
-		if err != nil {
-			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		adventureValue := session.Values[fmt.Sprintf("%v:%v", player, adventureId)]
-		fmt.Println("Session entry key:", fmt.Sprintf("%v:%v", player, adventureId))
-		if adventureValue == nil {
-			c.JSON(404, gin.H{"error": "Adventure not found"})
-			return
-		}
-		adventure := &adventureEngine.Adventure{}
-		adventure, ok := adventureValue.(*adventureEngine.Adventure)
-		if !ok {
-			c.JSON(500, gin.H{"error": "Adventure unmarshaling failed. "})
-			return
-		}
-		// Fixing unmarshaling issue with ActualPosition
-		// if adventure.ActualPosition != nil {
-		// 	actualPosition := adventureEngine.GetPositionFromPositionList(adventure.Positions, adventure.ActualPosition.Code)
-		// 	if actualPosition != nil {
-		// 		adventure.ActualPosition = actualPosition
-		// 	}
-		// }
-		err = adventure.Do(actionCode)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
-		session.Values[fmt.Sprintf("%v:%v", player, adventure.Id)] = adventure
-		err = session.Save(c.Request, c.Writer)
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(200, actualPosition)
-	})
+	engine.POST("/new", routes.New)
+	engine.POST("/do", routes.Do)
+	engine.POST("/save", routes.Save)
 
 	go func() {
 		fmt.Printf("HTTP server is listening on port %v. %v\n", port, time.Now().Format("2006-01-02 15:04:05"))
