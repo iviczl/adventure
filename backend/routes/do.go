@@ -7,6 +7,7 @@ import (
 	"text-adventure/engine"
 	"text-adventure/middlewares"
 	"text-adventure/models"
+	"text-adventure/types"
 	"text-adventure/utils"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,7 @@ func Do(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Missing required parameters"})
 		return
 	}
-	userId, err := models.StringToGuid(middlewares.GetClaim(c, "user_id").(string))
+	userId, err := types.StringToGuid(middlewares.GetClaim(c, "user_id").(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 	"text-adventure/constants"
-	"text-adventure/models"
 	"text-adventure/models/dbmodels"
+	"text-adventure/types"
 	"text-adventure/utils"
 	"time"
 
@@ -25,7 +25,7 @@ func Login(c *gin.Context) {
 	// Check user credentials
 	var user *dbmodels.User
 	constants.DbClient.Where(&dbmodels.User{UserName: userName, Password: password}).First(&user)
-	if user.Id == models.ZeroGuid() {
+	if user.Id == types.ZeroGuid() {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}

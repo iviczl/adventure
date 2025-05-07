@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"text-adventure/constants"
+	"text-adventure/engine"
 	"text-adventure/middlewares"
 	"text-adventure/models"
 	"text-adventure/models/dbmodels"
@@ -15,58 +16,47 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(c *gin.Context) {
+func Load(c *gin.Context) {
 	body, err := utils.RequestBody(c)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	player := body["player"].(string)
-	adventureCode := body["gameId"].(string)
-
-	adventure, err := utils.Load(adventureCode, nil)
+	adventureId, err := types.StringToGuid(body["adventureId"].(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	adventure.Player.Name = player
-	if err := adventure.Start(); err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
 	userId, err := types.StringToGuid(middlewares.GetClaim(c, "user_id").(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	play := &dbmodels.Play{}
+	constants.DbClient.Where("user_id = ?", userId).Where("id = ?", adventureId).First(&play)
+	if play.Id == types.ZeroGuid() {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Cannot find play"})
+		return
+	}
+	adventure := &engine.Adventure{}
+	decoder := gob.NewDecoder(bytes.NewBuffer(play.Adventure))
+	err = decoder.Decode(&adventure)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	adventure.Id = play.Id
+	adventure.ActualPosition.ActualPositionAdventureId = play.Id
+	adventure.ActualPosition.AdventureId = play.Id
+
 	session, err := constants.SessionStore.New(c.Request, constants.SessionName)
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	var serialized bytes.Buffer
-	encoder := gob.NewEncoder(&serialized)
-	err = encoder.Encode(&adventure)
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	user := &dbmodels.User{}
-	constants.DbClient.Where("id = ?", userId).First(user)
-	if user.Id == types.ZeroGuid() {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-		return
-	}
-	play := dbmodels.Play{UserId: userId, AdventureTitle: adventure.Title, Adventure: serialized.Bytes()}
-	result := constants.DbClient.Create(&play)
-	if result.Error != nil {
-		fmt.Println("Failed to create a play:", result.Error)
-		return
-	}
-	adventure.Id = play.Id
-	adventure.ActualPosition.ActualPositionAdventureId = play.Id
-	adventure.ActualPosition.AdventureId = play.Id
+
 	actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
 	session.Values[fmt.Sprintf("%v:%v", userId, adventure.Id)] = adventure
 	fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", userId, adventure.Id))
@@ -75,5 +65,10 @@ func New(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, actualPosition)
+	playState := models.DtoPlayState{
+		AdventureId:    adventure.Id.String(),
+		Player:         adventure.Player.Name,
+		ActualPosition: models.PositionToDtoPosition(actualPosition),
+	}
+	c.JSON(200, playState)
 }

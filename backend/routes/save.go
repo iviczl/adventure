@@ -8,8 +8,8 @@ import (
 	"text-adventure/constants"
 	"text-adventure/engine"
 	"text-adventure/middlewares"
-	"text-adventure/models"
 	"text-adventure/models/dbmodels"
+	"text-adventure/types"
 	"text-adventure/utils"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ func Save(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	adventureId, err := models.StringToGuid(body["adventureId"].(string))
+	adventureId, err := types.StringToGuid(body["adventureId"].(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -31,7 +31,7 @@ func Save(c *gin.Context) {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	userId, err := models.StringToGuid(middlewares.GetClaim(c, "user_id").(string))
+	userId, err := types.StringToGuid(middlewares.GetClaim(c, "user_id").(string))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -57,7 +57,7 @@ func Save(c *gin.Context) {
 
 	play := &dbmodels.Play{}
 	constants.DbClient.Where("user_id = ?", userId).Where("id = ?", adventureId).First(&play)
-	if play.Id == models.ZeroGuid() {
+	if play.Id == types.ZeroGuid() {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Cannot find play"})
 		return
 	}

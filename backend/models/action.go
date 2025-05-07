@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"text-adventure/types"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -31,7 +32,7 @@ const (
 )
 
 type Action struct {
-	Id                          Guid                     `gorm:"primaryKey;" json:"id"`
+	Id                          types.Guid               `gorm:"primaryKey;" json:"id"`
 	Code                        string                   `gorm:"size:10;not null" json:"code"`
 	Description                 string                   `gorm:"size:100;not null" json:"description"`
 	Operation                   ActionOperation          `gorm:"size:10;not null" json:"operation"`
@@ -49,10 +50,10 @@ type Action struct {
 	Functions                   []map[string]interface{} `gorm:"-" json:"functions"`
 	Active                      *bool                    `gorm:"default:true;not null" json:"active"`
 	Visible                     *bool                    `gorm:"default:true;not null" json:"visible"`
-	AvailableActionsPositionId  Guid                     `gorm:"index" json:"-"` // Foreign Key to Position
-	EnteringActionsPositionId   Guid                     `gorm:"index" json:"-"` // Foreign Key to Position
-	LeavingActionsPositionId    Guid                     `gorm:"index" json:"-"` // Foreign Key to Position
-	AvailableActionsAdventureId Guid                     `gorm:"index" json:"-"` // Foreign Key to Adventure
+	AvailableActionsPositionId  types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
+	EnteringActionsPositionId   types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
+	LeavingActionsPositionId    types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
+	AvailableActionsAdventureId types.Guid               `gorm:"index" json:"-"` // Foreign Key to Adventure
 
 	// Relationships
 	AvailableActionsPosition  Position  `gorm:"foreignKey:AvailableActionsPositionId" json:"-"`
@@ -63,7 +64,7 @@ type Action struct {
 
 func (a *Action) BeforeCreate(tx *gorm.DB) error {
 	id, err := uuid.NewRandom()
-	a.Id = Guid(id)
+	a.Id = types.Guid(id)
 	return err
 }
 

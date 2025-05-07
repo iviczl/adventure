@@ -25,7 +25,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
     }
   }
 
-  if (!state.value.selectedGameId) {
+  if (!state.value.actualPosition) {
     return null
   }
 

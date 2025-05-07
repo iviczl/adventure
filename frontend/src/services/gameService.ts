@@ -2,6 +2,8 @@ import { Position } from '../types/position'
 import { state } from '../state'
 import { GameInfo } from '../types/gameInfo'
 import { LoginResponse } from '../types/loginResponse'
+import { PlayInfo } from '../types/play'
+import { PlayState } from '../types/playState'
 
 let abortController: AbortController
 const portExpression = import.meta.env.VITE_SERVICE_PORT
@@ -40,6 +42,22 @@ export async function login(userName: string, password: string) {
   }
 }
 
+export async function getPlays() {
+  abortController = new AbortController()
+  const result = await doFetch(`${apiBasePath}/plays`)
+
+  if (assertError(result)) {
+    return
+  }
+  const list = (await result.response) as PlayInfo[]
+  if (list) {
+    state.value = {
+      ...state.value,
+      plays: list,
+    }
+  }
+}
+
 export async function getGames() {
   abortController = new AbortController()
   const result = await doFetch(`${apiBasePath}/games`)
@@ -54,6 +72,26 @@ export async function getGames() {
       games: list,
       selectedGameId: '',
     }
+  }
+}
+
+export async function loadGame(adventureId: string) {
+  abortController = new AbortController()
+  const result = await doFetch(`${apiBasePath}/load`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ adventureId }),
+  })
+
+  if (assertError(result)) {
+    return
+  }
+  const playState = (await result.response) as PlayState
+  state.value = {
+    ...state.value,
+    adventureId: playState.adventureId,
+    player: playState.player,
+    actualPosition: playState.actualPosition,
   }
 }
 

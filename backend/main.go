@@ -72,6 +72,7 @@ func main() {
 	engine.POST("/do", routes.Do)
 	engine.POST("/save", routes.Save)
 	engine.GET("/plays", routes.Plays)
+	engine.POST("/load", routes.Load)
 
 	go func() {
 		fmt.Printf("HTTP server is listening on port %v. %v\n", port, time.Now().Format("2006-01-02 15:04:05"))

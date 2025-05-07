@@ -1,6 +1,8 @@
 package models
 
 import (
+	"text-adventure/types"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -21,15 +23,15 @@ var AdventurePhases = map[string]AdventurePhase{
 
 type Adventure struct {
 	// Id                uuid.UUID      `gorm:"type:uuid;primaryKey;default:lower(hex(randomblob(16)))" json:"id"`
-	Id                Guid           `gorm:"primaryKey;" json:"id"`
+	Id                types.Guid     `gorm:"primaryKey;" json:"id"`
 	Code              string         `gorm:"size:10;not null" json:"code"`
 	Title             string         `gorm:"size:60;not null" json:"title"`
 	Description       string         `gorm:"size:100;not null" json:"description"`
 	StartPositionCode string         `gorm:"size:10;not null" json:"startPositionCode"`
 	Phase             AdventurePhase `gorm:"type:varchar(255);default:'-1'" json:"phase"`
-	ActualPositionId  Guid           `gorm:"index" json:"actualPositionId"` // Foreign key for Position
+	ActualPositionId  types.Guid     `gorm:"index" json:"actualPositionId"` // Foreign key for Position
 	ActualPosition    *Position      `gorm:"foreignKey:ActualPositionId"  json:"actualPosition"`
-	PlayerId          Guid           `gorm:"index" json:"playerId"` // Foreign key for Player
+	PlayerId          types.Guid     `gorm:"index" json:"playerId"` // Foreign key for Player
 	Player            *Player        `gorm:"foreignKey:PlayerId" json:"player"`
 	Positions         []*Position    `gorm:"foreignKey:AdventureId" json:"positions"`                        // One-to-many relation to Position
 	AvailableActions  []*Action      `gorm:"foreignKey:AvailableActionsAdventureId" json:"availableActions"` // One-to-many relation to Action
@@ -37,6 +39,6 @@ type Adventure struct {
 
 func (a *Adventure) BeforeCreate(tx *gorm.DB) error {
 	id, err := uuid.NewRandom()
-	a.Id = Guid(id)
+	a.Id = types.Guid(id)
 	return err
 }

@@ -3,29 +3,30 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"text-adventure/types"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type Position struct {
-	Id                        Guid      `gorm:"primaryKey;" json:"id"`
-	Code                      string    `gorm:"size:10;not null" json:"code"`
-	Description               string    `gorm:"size:500;not null" json:"description"`
-	Visited                   bool      `gorm:"default: false" json:"visited"`
-	EndPosition               bool      `gorm:"default: false" json:"endPosition"`
-	AvailableActions          []*Action `gorm:"foreignKey:AvailableActionsPositionId" json:"availableActions"`
-	EnteringActions           []*Action `gorm:"foreignKey:EnteringActionsPositionId" json:"enteringActions"`
-	LeavingActions            []*Action `gorm:"foreignKey:LeavingActionsPositionId" json:"leavingActions"`
-	Items                     []*Item   `gorm:"foreignKey:PositionId" json:"items"`
-	AdventureId               Guid      `gorm:"foreignKey:Id" json:"adventureId"`
-	ActualPositionAdventureId Guid      `gorm:"foreignKey:Id;" json:"actualPositionAdventureId"` // Foreign Key to Adventure
-	TemporaryDescription      string    `gorm:"size:500;" json:"temporaryDescription"`
+	Id                        types.Guid `gorm:"primaryKey;" json:"id"`
+	Code                      string     `gorm:"size:10;not null" json:"code"`
+	Description               string     `gorm:"size:500;not null" json:"description"`
+	Visited                   bool       `gorm:"default: false" json:"visited"`
+	EndPosition               bool       `gorm:"default: false" json:"endPosition"`
+	AvailableActions          []*Action  `gorm:"foreignKey:AvailableActionsPositionId" json:"availableActions"`
+	EnteringActions           []*Action  `gorm:"foreignKey:EnteringActionsPositionId" json:"enteringActions"`
+	LeavingActions            []*Action  `gorm:"foreignKey:LeavingActionsPositionId" json:"leavingActions"`
+	Items                     []*Item    `gorm:"foreignKey:PositionId" json:"items"`
+	AdventureId               types.Guid `gorm:"foreignKey:Id" json:"adventureId"`
+	ActualPositionAdventureId types.Guid `gorm:"foreignKey:Id;" json:"actualPositionAdventureId"` // Foreign Key to Adventure
+	TemporaryDescription      string     `gorm:"size:500;" json:"temporaryDescription"`
 }
 
 func (p *Position) BeforeCreate(tx *gorm.DB) error {
 	id, err := uuid.NewRandom()
-	p.Id = Guid(id)
+	p.Id = types.Guid(id)
 	return err
 }
 
