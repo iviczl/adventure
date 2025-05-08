@@ -86,3 +86,59 @@ func (a *Action) UnmarshalJSON(text []byte) error {
 	*a = Action(aux)
 	return nil
 }
+
+// func (a *Action) MarshalBinary() (_ []byte, err error) {
+// 	var buf bytes.Buffer
+// 	enc := gob.NewEncoder(&buf)
+// 	enc.Encode(p.Name)
+// 	if p.Q == nil {
+// 			return buf.Bytes(), nil
+// 	}
+// 	isCyclic := p.Q != nil && p.Q.P == p
+// 	enc.Encode(isCyclic)
+// 	if isCyclic {
+// 			p.Q.P = nil
+// 			err = enc.Encode(p.Q)
+// 			p.Q.P = p
+// 	} else {
+// 			err = enc.Encode(p.Q)
+// 	}
+// 	//buf.Encode
+// 	return buf.Bytes(), err
+// }
+
+// func (a *Action) UnmarshalBinary(data []byte) (err error) {
+// 	copy := data
+// 	dec := gob.NewDecoder(bytes.NewReader(copy))
+// 	if err = dec.Decode(&a); err != nil {
+// 		return err
+// 	}
+// 	if a.Active == nil {
+// 		a.Active = new(bool)
+// 	}
+// 	if a.Visible == nil {
+// 		a.Visible = new(bool)
+// 	}
+// 	if a.ActionActive == nil {
+// 		a.ActionActive = new(bool)
+// 	}
+// 	if a.ActionVisible == nil {
+// 		a.ActionVisible = new(bool)
+// 	}
+// 	return nil
+// }
+
+func (a *Action) AdjustAction() {
+	if a.Active == nil {
+		a.Active = new(bool)
+	}
+	if a.Visible == nil {
+		a.Visible = new(bool)
+	}
+	if a.ActionActive == nil {
+		a.ActionActive = new(bool)
+	}
+	if a.ActionVisible == nil {
+		a.ActionVisible = new(bool)
+	}
+}

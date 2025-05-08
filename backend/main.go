@@ -39,12 +39,12 @@ func CorsMiddleware() gin.HandlerFunc {
 }
 
 func init() {
-	gob.Register(&engine.Adventure{})
-	gob.Register(&models.Position{})
-	gob.Register(&models.Action{})
+	gob.Register(make(map[string]interface{}))
 	gob.Register(&models.Item{})
 	gob.Register(&models.Player{})
-	gob.Register(make(map[string]interface{}))
+	gob.Register(&models.Action{})
+	gob.Register(&models.Position{})
+	gob.Register(&engine.Adventure{})
 }
 
 func main() {

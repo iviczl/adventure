@@ -52,6 +52,7 @@ func New(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
 	user := &dbmodels.User{}
 	constants.DbClient.Where("id = ?", userId).First(user)
 	if user.Id == types.ZeroGuid() {

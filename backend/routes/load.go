@@ -47,9 +47,27 @@ func Load(c *gin.Context) {
 		return
 	}
 
-	adventure.Id = play.Id
-	adventure.ActualPosition.ActualPositionAdventureId = play.Id
-	adventure.ActualPosition.AdventureId = play.Id
+	// fix deserialization issue with actions
+	for i := range adventure.Positions {
+		for j := range adventure.Positions[i].AvailableActions {
+			adventure.Positions[i].AvailableActions[j].AdjustAction()
+		}
+		for j := range adventure.Positions[i].EnteringActions {
+			adventure.Positions[i].EnteringActions[j].AdjustAction()
+		}
+		for j := range adventure.Positions[i].LeavingActions {
+			adventure.Positions[i].LeavingActions[j].AdjustAction()
+		}
+	}
+
+	// fix deserialization issue with adventure.ActualPosition
+	positionCode := adventure.ActualPosition.Code
+	for i := range adventure.Positions {
+		if adventure.Positions[i].Code == positionCode {
+			adventure.ActualPosition = adventure.Positions[i]
+			break
+		}
+	}
 
 	session, err := constants.SessionStore.New(c.Request, constants.SessionName)
 	if err != nil {
@@ -58,15 +76,15 @@ func Load(c *gin.Context) {
 	}
 
 	actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
-	session.Values[fmt.Sprintf("%v:%v", userId, adventure.Id)] = adventure
-	fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", userId, adventure.Id))
+	session.Values[fmt.Sprintf("%v:%v", userId, play.Id)] = adventure
+	fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", userId, play.Id))
 	err = session.Save(c.Request, c.Writer)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 	playState := models.DtoPlayState{
-		AdventureId:    adventure.Id.String(),
+		AdventureId:    play.Id.String(),
 		Player:         adventure.Player.Name,
 		ActualPosition: models.PositionToDtoPosition(actualPosition),
 	}

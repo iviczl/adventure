@@ -12,7 +12,6 @@ export default function ToolBar() {
     if (success) {
       state.value = {
         ...state.value,
-        token: undefined,
         player: '',
         selectedGameId: '',
         adventureId: '',

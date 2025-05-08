@@ -40,6 +40,7 @@ export default function Login({ state }: { state: Signal<AppState> }) {
             type='text'
             onChange={(e) => setUserName(e.target.value)}
             value={userName}
+            autoFocus
           />
         </Row>
         <Row>
