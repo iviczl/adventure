@@ -17,6 +17,10 @@ export interface ContainerProps extends SizeProps {
   $visible?: boolean
 }
 
+export interface LabelProps extends SizeProps {
+  $color?: string
+}
+
 export const devices = {
   mobile: `(max-width: 1023px)`,
   desktop: `(min-width: 1024px)`,
@@ -147,7 +151,7 @@ export const Paragraph = styled.p`
   margin: 1rem 0 0.5rem 0;
 `
 
-export const Label = styled.label<SizeProps>`
+export const Label = styled.label<LabelProps>`
   font-size: 1rem;
   margin-left: ${(props) => props.$marginLeft || '1rem'};
   font-weight: 500;
@@ -155,6 +159,7 @@ export const Label = styled.label<SizeProps>`
   line-height: 0.8rem; //calc(2.2rem + 2px);
   padding: 0.5rem 0;
   width: ${(props) => props.$width || 'unset'};
+  color: ${(props) => props.$color || 'inherited'};
 `
 export const Option = styled.option`
   padding: 0.6rem 0.6rem 0.6rem 0.6rem;

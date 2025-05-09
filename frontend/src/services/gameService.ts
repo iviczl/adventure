@@ -141,7 +141,7 @@ export async function takeAction(
 
 function assertError(result: { response: Promise<Position>; error: unknown }) {
   if (result.error) {
-    console.log(result.error)
+    console.error(result.error)
     return true
   }
   return false
@@ -159,6 +159,9 @@ export async function doFetch(url: string, options = {} as RequestInit) {
     }
     const signal = abortController.signal
     const res = await fetch(url, { ...options, credentials: 'include', signal })
+    if (!res.ok) {
+      throw new Error(`An error happened: ${res.statusText}`)
+    }
     response = await res.json()
   } catch (problem) {
     abortController.abort()
