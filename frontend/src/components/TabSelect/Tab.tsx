@@ -12,7 +12,11 @@ export default function Tab({
   onClick: (id: string) => void
 }) {
   if (id === selectedId) {
-    return <SelectedTab>{title}</SelectedTab>
+    return <SelectedTab tabIndex={0}>{title}</SelectedTab>
   }
-  return <UnselectedTab onClick={() => onClick(id)}>{title}</UnselectedTab>
+  return (
+    <UnselectedTab tabIndex={0} onClick={() => onClick(id)}>
+      {title}
+    </UnselectedTab>
+  )
 }

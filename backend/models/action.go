@@ -108,11 +108,15 @@ func (a *Action) UnmarshalJSON(text []byte) error {
 // }
 
 // func (a *Action) UnmarshalBinary(data []byte) (err error) {
-// 	copy := data
-// 	dec := gob.NewDecoder(bytes.NewReader(copy))
-// 	if err = dec.Decode(&a); err != nil {
+// 	buffer := bytes.NewBuffer(data)
+// 	dec := gob.NewDecoder(buffer)
+// 	type Alias Action
+// 	var ac Alias
+
+// 	if err = dec.Decode(&ac); err != nil {
 // 		return err
 // 	}
+// 	*a = Action(ac)
 // 	if a.Active == nil {
 // 		a.Active = new(bool)
 // 	}

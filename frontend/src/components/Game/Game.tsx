@@ -22,6 +22,7 @@ const Game = ({ state }: { state: Signal<AppState> }) => {
     state.value = {
       ...state.value,
       selectedGameId: '',
+      actualPosition: undefined,
     }
   }
 
