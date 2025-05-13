@@ -46,11 +46,26 @@ func InitDbClient() {
 		fmt.Println("Failed to migrate the database:", err)
 		return
 	}
+	var count int64
+	DbClient.Model(&dbmodels.User{}).Count(&count)
+	if count == 0 {
+		user := dbmodels.User{UserName: "admin", Email: "admin@admin.com", Password: "admin", RegistrationCode: "sasa"}
+		result := DbClient.Create(&user)
+		if result.Error != nil {
+			fmt.Println("Failed to create user:", result.Error)
+			return
+		}
+		user = dbmodels.User{UserName: "alfa", Email: "alfa@admin.com", Password: "alfa", RegistrationCode: "sasa"}
+		result = DbClient.Create(&user)
+		if result.Error != nil {
+			fmt.Println("Failed to create user:", result.Error)
+			return
+		}
+		user = dbmodels.User{UserName: "beta", Email: "beta@admin.com", Password: "beta", RegistrationCode: "sasa"}
+		result = DbClient.Create(&user)
+		if result.Error != nil {
+			fmt.Println("Failed to create user:", result.Error)
+			return
+		}
+	}
 }
-
-// user := dbmodels.User{UserName: "admin", Email: "admin@admin.com", Password: "admin", RegistrationCode: "sasa"}
-// result := db.Create(&user)
-// if result.Error != nil {
-// 	fmt.Println("Failed to create user:", result.Error)
-// 	return
-// }

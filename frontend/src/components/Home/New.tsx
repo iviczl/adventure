@@ -17,7 +17,7 @@ import { startGame } from '../../services/gameService'
 import { GameInfo } from '../../types/gameInfo'
 
 export default function New({ state }: { state: Signal<AppState> }) {
-  const [player, setPlayer] = useState('')
+  const [player, setPlayer] = useState(state.value.userName)
   const [selectedGameId, setSelectedGameId] = useState(
     state.value.selectedGameId
   )

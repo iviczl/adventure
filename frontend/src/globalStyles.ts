@@ -108,13 +108,22 @@ export const Container = styled.div<ContainerProps>`
   border-radius: clamp(5px, 20px, 25px);
   background-color: #cc9977;
 `
-export const Row = styled.div<SizeProps>`
+export interface RowProps extends SizeProps {
+  $gap?: string
+  $justifyContent?: string
+}
+
+export const Row = styled.div<RowProps>`
   padding: 0;
   display: flex;
   flex-wrap: wrap;
+  gap: ${(props) => props.$gap || '1rem'};
   width: ${(props) => props.$width || 'unset'};
   height: ${(props) => props.$height || 'unset'};
+  justify-content: ${(props) => props.$justifyContent || 'unset'};
   max-width: 100%;
+  margin-bottom: ${(props) => props.$marginBottom || 'unset'};
+  margin-top: ${(props) => props.$marginTop || 'unset'};
 `
 
 export const Button = styled.button`
@@ -227,4 +236,24 @@ export const Input = styled.input<SizeProps>`
     outline: 4px auto -webkit-focus-ring-color;
   }
 }
+`
+export const Dialog = styled.dialog<SizeProps>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: ${(props) => props.$width || '50%'};
+  max-width: 90%;
+  border-radius: 8px;
+  padding: 0.6rem 0.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: white;
+  color: #331111;
+  border: solid 1px #331111;
+  &::backdrop {
+    background-color: black;
+    opacity: 50%;
+  }
 `
