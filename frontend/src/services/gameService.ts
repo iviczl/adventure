@@ -107,13 +107,13 @@ export async function startGame(gameId: string, player: string) {
     return
   }
   // {gameId: string, position: Position}
-  const position = (await result.response) as Position
+  const playState = (await result.response) as PlayState
   state.value = {
     ...state.value,
     selectedGameId: gameId,
     player: player,
-    adventureId: position.adventureId,
-    actualPosition: position,
+    adventureId: playState.adventureId,
+    actualPosition: playState.actualPosition,
   }
 }
 

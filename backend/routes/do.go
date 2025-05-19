@@ -59,5 +59,5 @@ func Do(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, actualPosition)
+	c.JSON(200, models.PositionToDtoPosition(actualPosition))
 }
