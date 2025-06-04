@@ -59,15 +59,20 @@ func New(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
-	play := dbmodels.Play{UserId: userId, AdventureTitle: adventure.Title, Adventure: serialized.Bytes()}
-	result := constants.DbClient.Create(&play)
-	if result.Error != nil {
-		fmt.Println("Failed to create a play:", result.Error)
+	// play := dbmodels.Play{UserId: userId, AdventureTitle: adventure.Title, Adventure: serialized.Bytes()}
+	// result := constants.DbClient.Create(&play)
+	// if result.Error != nil {
+	// 	fmt.Println("Failed to create a play:", result.Error)
+	// 	return
+	// }
+	playId, err := types.NewGuid()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	adventure.Id = play.Id
-	adventure.ActualPosition.ActualPositionAdventureId = play.Id
-	adventure.ActualPosition.AdventureId = play.Id
+	adventure.Id = playId
+	adventure.ActualPosition.ActualPositionAdventureId = playId
+	adventure.ActualPosition.AdventureId = playId
 	actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
 	session.Values[fmt.Sprintf("%v:%v", userId, adventure.Id)] = adventure
 	fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", userId, adventure.Id))
@@ -77,7 +82,7 @@ func New(c *gin.Context) {
 		return
 	}
 	playState := &models.DtoPlayState{
-		AdventureId:    play.Id.String(),
+		AdventureId:    playId.String(),
 		Player:         adventure.Player.Name,
 		ActualPosition: models.PositionToDtoPosition(actualPosition),
 	}

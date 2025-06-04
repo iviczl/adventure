@@ -11,6 +11,13 @@
         "description": "a normal torch",
         "state": "not lit"
       }
+    ],
+    "attributes": [
+      { "vitality": 10 },
+      { "dexterity": 10 },
+      { "mana": 10 },
+      { "fireball": 2 },
+      { "healing": 4 }
     ]
   },
   "startPositionCode": "0",

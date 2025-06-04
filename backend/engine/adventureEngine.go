@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"math/rand"
+	"text-adventure/constants"
 	"text-adventure/models"
 )
 
@@ -307,7 +308,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	}
 
 	switch action.Operation {
-	case models.CHANGE_POSITION:
+	case constants.CHANGE_POSITION:
 		if action.PositionCode == "" {
 			return fmt.Errorf("missing position in action %s", action.Code)
 		}
@@ -325,7 +326,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			adventure.Phase = models.ENDED
 		}
 
-	case models.CHANGE_POSITION_DESCRIPTION:
+	case constants.CHANGE_POSITION_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" {
 			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
@@ -336,7 +337,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position.Description = action.PositionDescription
 		}
 
-	case models.CHANGE_POSITION_TEMPORARY_DESCRIPTION:
+	case constants.CHANGE_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" {
 			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
@@ -347,7 +348,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position.TemporaryDescription = action.PositionDescription
 		}
 
-	case models.APPEND_POSITION_TEMPORARY_DESCRIPTION:
+	case constants.APPEND_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" && action.PositionCode != adventure.ActualPosition.Code {
 			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
@@ -358,7 +359,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position.TemporaryDescription = position.Description + " " + action.PositionDescription
 		}
 
-	case models.PREPEND_POSITION_TEMPORARY_DESCRIPTION:
+	case constants.PREPEND_POSITION_TEMPORARY_DESCRIPTION:
 		var position *models.Position
 		if action.PositionCode != "" && action.PositionCode != adventure.ActualPosition.Code {
 			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
@@ -370,7 +371,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 		}
 		fmt.Println("PREPEND POSITION TEMPORARY DESCRIPTION ", action.Visible)
 
-	case models.CHANGE_POSITION_VISITED:
+	case constants.CHANGE_POSITION_VISITED:
 		var position *models.Position
 		if action.PositionCode != "" {
 			position = GetPositionFromPositionList(adventure.Positions, action.PositionCode)
@@ -381,33 +382,33 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position.Visited = action.PositionVisited
 		}
 
-	case models.CHANGE_ACTION_ACTIVE:
+	case constants.CHANGE_ACTION_ACTIVE:
 		adventure.changeActionActive(action.ActionCode, *action.ActionActive)
 
-	case models.CHANGE_ACTION_VISIBLE:
+	case constants.CHANGE_ACTION_VISIBLE:
 		adventure.changeActionVisible(action.ActionCode, *action.ActionVisible)
 
-	case models.CHANGE_ITEM_DESCRIPTION:
+	case constants.CHANGE_ITEM_DESCRIPTION:
 		return adventure.changeItemDescription(action.ItemCode, action.ItemDescription)
 
-	case models.CHANGE_ITEM_STATE:
+	case constants.CHANGE_ITEM_STATE:
 		return adventure.changeItemState(action.ItemCode, action.Value)
 
-	case models.PICK_UP_ITEM:
+	case constants.PICK_UP_ITEM:
 		item := popItemFromList(&adventure.ActualPosition.Items, action.ItemCode)
 		if item == nil {
 			return fmt.Errorf("there is no such item at the actual position: %s:%s", adventure.ActualPosition.Code, action.ItemCode)
 		}
 		adventure.Player.Items = append(adventure.Player.Items, item)
 
-	case models.PUT_DOWN_ITEM:
+	case constants.PUT_DOWN_ITEM:
 		item := popItemFromList(&adventure.Player.Items, action.ItemCode)
 		if item == nil {
 			return fmt.Errorf("there is no such item in the player's inventory: %s", action.ItemCode)
 		}
 		adventure.ActualPosition.Items = append(adventure.ActualPosition.Items, item)
 
-	case models.MOVE_ITEM:
+	case constants.MOVE_ITEM:
 		item := popItemFromList(&adventure.ActualPosition.Items, action.ItemCode)
 		if item == nil {
 			return fmt.Errorf("there is no such item at the actual position: %s:%s", adventure.ActualPosition.Code, action.ItemCode)
@@ -418,20 +419,20 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 		}
 		newPosition.Items = append(newPosition.Items, item)
 
-	case models.ERASE_ITEM:
+	case constants.ERASE_ITEM:
 		item := popItemFromList(&adventure.ActualPosition.Items, action.ItemCode)
 		if item == nil {
 			return fmt.Errorf("there is no such item at the actual position: %s:%s", adventure.ActualPosition.Code, action.ItemCode)
 		}
 
-	case models.CONDITIONAL:
+	case constants.CONDITIONAL:
 		// var function map[string]interface{} // func(*Adventure) bool
 		// if err := json.Unmarshal([]byte(action.Function), &function); err != nil {
 		// 	return err
 		// }
 		conditional(action.Function, adventure)
 
-	case models.SWITCH_CONDITIONAL:
+	case constants.SWITCH_CONDITIONAL:
 		// var functions []map[string]interface{} //[]func(*Adventure) bool
 		// if err := json.Unmarshal([]byte(action.Functions), &functions); err != nil {
 		// 	return err
@@ -442,7 +443,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			}
 		}
 
-	case models.LIST:
+	case constants.LIST:
 		// var actionCodes []string
 		// if err := json.Unmarshal([]byte(action.ActionCodes), &actionCodes); err != nil {
 		// 	return err
@@ -462,7 +463,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			}
 		}
 
-	case models.RANDOM:
+	case constants.RANDOM:
 		// var actionCodes []string
 		// if err := json.Unmarshal([]byte(action.ActionCodes), &actionCodes); err != nil {
 		// 	return err
@@ -483,7 +484,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 
 func (adventure *Adventure) Start() error {
 	action := &models.Action{}
-	action.Operation = models.CHANGE_POSITION
+	action.Operation = constants.CHANGE_POSITION
 	action.PositionCode = adventure.StartPositionCode
 	activeVar := true
 	action.Active = &activeVar

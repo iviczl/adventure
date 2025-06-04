@@ -25,11 +25,16 @@ func (a *Item) BeforeCreate(tx *gorm.DB) error {
 	return err
 }
 
+type Attribute struct {
+	Name  string `gorm:"size:40;not null" json:"name"`
+	Value int    `gorm:"not null" json:"value"`
+}
+
 type Player struct {
 	Id         types.Guid   `gorm:"primaryKey;" json:"id"`
 	Name       string       `gorm:"size:40;not null" json:"name"`
 	Items      []*Item      `gorm:"foreignKey:PlayerId" json:"items"`
-	Adventures []*Adventure `gorm:"foreignKey:PlayerId" json:"adventures"`
+	Attributes []*Attribute `gorm:"foreignKey:PlayerId" json:"adventures"`
 }
 
 func (p *Player) BeforeCreate(tx *gorm.DB) error {

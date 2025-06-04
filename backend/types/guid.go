@@ -54,6 +54,14 @@ func (my Guid) Value() (driver.Value, error) {
 	return uuid.UUID(my).MarshalBinary()
 }
 
+func NewGuid() (Guid, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return ZeroGuid(), err
+	}
+	return Guid(id), nil
+}
+
 // func SetId[T *struct{ Id Guid } ](entity T) error {
 // func SetId[T ~struct{ Id Guid } ](entity *T) error {
 // 	id, err := uuid.NewRandom()

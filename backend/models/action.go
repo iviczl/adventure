@@ -3,39 +3,15 @@ package models
 import (
 	"encoding/json"
 	"text-adventure/types"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
-)
-
-type ActionOperation string
-
-const (
-	CHANGE_POSITION                        ActionOperation = "cp"
-	CHANGE_POSITION_DESCRIPTION            ActionOperation = "cpd"
-	CHANGE_POSITION_TEMPORARY_DESCRIPTION  ActionOperation = "cptd"
-	APPEND_POSITION_TEMPORARY_DESCRIPTION  ActionOperation = "aptd"
-	PREPEND_POSITION_TEMPORARY_DESCRIPTION ActionOperation = "pptd"
-	CHANGE_POSITION_VISITED                ActionOperation = "cpv"
-	CHANGE_ACTION_ACTIVE                   ActionOperation = "caa"
-	CHANGE_ACTION_VISIBLE                  ActionOperation = "cav"
-	CHANGE_ITEM_DESCRIPTION                ActionOperation = "cad"
-	CHANGE_ITEM_STATE                      ActionOperation = "cis"
-	PICK_UP_ITEM                           ActionOperation = "pui"
-	PUT_DOWN_ITEM                          ActionOperation = "pdi"
-	MOVE_ITEM                              ActionOperation = "moi"
-	ERASE_ITEM                             ActionOperation = "eri"
-	CONDITIONAL                            ActionOperation = "con"
-	SWITCH_CONDITIONAL                     ActionOperation = "scon"
-	LIST                                   ActionOperation = "ls"
-	RANDOM                                 ActionOperation = "ran"
+	// "github.com/google/uuid"
+	// "gorm.io/gorm"
 )
 
 type Action struct {
-	Id                          types.Guid               `gorm:"primaryKey;" json:"id"`
+	// Id                          types.Guid               `gorm:"primaryKey;" json:"id"`
 	Code                        string                   `gorm:"size:10;not null" json:"code"`
 	Description                 string                   `gorm:"size:100;not null" json:"description"`
-	Operation                   ActionOperation          `gorm:"size:10;not null" json:"operation"`
+	Operation                   types.ActionOperation    `gorm:"size:10;not null" json:"operation"`
 	PositionCode                string                   `gorm:"size:10;" json:"positionCode"`
 	PositionDescription         string                   `gorm:"size:500;" json:"positionDescription"`
 	PositionVisited             bool                     `gorm:"default:true" json:"positionVisited"`
@@ -62,11 +38,11 @@ type Action struct {
 	AvailableActionsAdventure Adventure `gorm:"foreignKey:AvailableActionsAdventureId" json:"-"`
 }
 
-func (a *Action) BeforeCreate(tx *gorm.DB) error {
-	id, err := uuid.NewRandom()
-	a.Id = types.Guid(id)
-	return err
-}
+// func (a *Action) BeforeCreate(tx *gorm.DB) error {
+// 	id, err := uuid.NewRandom()
+// 	a.Id = types.Guid(id)
+// 	return err
+// }
 
 func (a *Action) UnmarshalJSON(text []byte) error {
 	type Alias Action
