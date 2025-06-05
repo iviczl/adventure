@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Button } from '../../globalStyles'
+import { Button, Label } from '../../globalStyles'
 import { save } from '../../services/gameService'
 import { AppState, state } from '../../state'
-import { ToolHeadBar } from './gameStyles'
+import { AttributeList, ToolHeadBar } from './gameStyles'
 import { createPortal } from 'react-dom'
 import SaveModal from './SaveModal'
 
@@ -28,6 +28,19 @@ export default function ToolBar() {
     setShowSaveModal(false)
   }
 
+  const attributeList = () => {
+    return state.value.playerAttributes.map((attr) => (
+      <>
+        <div>
+          <Label>{Object.keys(attr)[0]}:</Label>
+        </div>
+        <div>
+          <Label>{attr[Object.keys(attr)[0]]}</Label>
+        </div>
+      </>
+    ))
+  }
+
   const cancel = () => {
     setShowSaveModal(false)
   }
@@ -38,6 +51,7 @@ export default function ToolBar() {
           <SaveModal onQuit={quit} onCancel={cancel} />,
           document.getElementById('root')!
         )}
+      <AttributeList>{attributeList()}</AttributeList>
       <Button
         onClick={() => setShowSaveModal(true)}
         disabled={requestProcessing}

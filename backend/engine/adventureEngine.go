@@ -194,14 +194,14 @@ func popItemFromList(items *[]*models.Item, itemCode string) *models.Item {
 }
 
 // getItemFromPlayer retrieves an item by its code from the player's inventory.
-func getItemFromPlayer(player *models.Player, itemCode string) *models.Item {
-	for i := range player.Items {
-		if player.Items[i].Code == itemCode {
-			return player.Items[i]
-		}
-	}
-	return nil
-}
+// func getItemFromPlayer(player *models.Player, itemCode string) *models.Item {
+// 	for i := range player.Items {
+// 		if player.Items[i].Code == itemCode {
+// 			return player.Items[i]
+// 		}
+// 	}
+// 	return nil
+// }
 
 // getItemFromPosition retrieves an item by its code from a single position.
 func getItemFromPosition(position *models.Position, itemCode string) *models.Item {
@@ -220,14 +220,18 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 	for _, conditionInterface := range function["conditions"].([]interface{}) {
 		condition := conditionInterface.(map[string]interface{})
 
-		if mustHave, ok := condition["playerMustHave"]; ok {
+		if mustHave, ok := condition["playerMustHave"].(bool); ok {
 			if _, exists := condition["itemCode"]; !exists {
 				panic("Missing item code.")
 			}
 			itemCode := condition["itemCode"].(string)
-			hasItem := getItemFromPlayer(adventure.Player, itemCode) != nil
-			conditionsMet = conditionsMet && !(mustHave.(bool) != hasItem)
-
+			item := adventure.Player.GetItem(itemCode)
+			hasItem := item != nil
+			conditionsMet = conditionsMet && !(mustHave != hasItem)
+			if state, exists := condition["itemState"]; exists {
+				stateOk := item.State == state.(string)
+				conditionsMet = conditionsMet && !(stateOk != hasItem)
+			}
 		} else if mustHave, ok := condition["positionMustHave"]; ok {
 			if _, exists := condition["positionCode"]; !exists {
 				panic("Missing position code.")

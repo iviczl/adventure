@@ -16,9 +16,9 @@
       { "vitality": 10 },
       { "dexterity": 10 },
       { "mana": 10 },
-      { "fireball": 2 },
-      { "healing": 4 }
-    ]
+      { "strength": 10 }
+    ],
+    "abilities": [{ "fireball": 2 }, { "healing": 4 }]
   },
   "startPositionCode": "0",
   "availableActions": [],

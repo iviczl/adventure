@@ -90,7 +90,8 @@ export async function loadGame(adventureId: string) {
   state.value = {
     ...state.value,
     adventureId: playState.adventureId,
-    player: playState.player,
+    player: playState.player.name,
+    playerAttributes: playState.player.attributes,
     actualPosition: playState.actualPosition,
   }
 }
@@ -111,10 +112,12 @@ export async function startGame(gameId: string, player: string) {
   state.value = {
     ...state.value,
     selectedGameId: gameId,
-    player: player,
+    player: playState.player.name,
+    playerAttributes: playState.player.attributes,
     adventureId: playState.adventureId,
     actualPosition: playState.actualPosition,
   }
+  console.log('ATTRIBUTES', playState.player.attributes)
 }
 
 export async function takeAction(

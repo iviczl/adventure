@@ -2,6 +2,6 @@ package models
 
 type DtoPlayState struct {
 	AdventureId    string      `json:"adventureId"`
-	Player         string      `json:"player"`
+	Player         DtoPlayer   `json:"player"`
 	ActualPosition DtoPosition `json:"actualPosition"`
 }

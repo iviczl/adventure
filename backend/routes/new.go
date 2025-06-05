@@ -83,8 +83,9 @@ func New(c *gin.Context) {
 	}
 	playState := &models.DtoPlayState{
 		AdventureId:    playId.String(),
-		Player:         adventure.Player.Name,
+		Player:         models.PlayerToDtoPlayer(adventure.Player),
 		ActualPosition: models.PositionToDtoPosition(actualPosition),
 	}
+	fmt.Println("Player attr:", adventure.Player.Attributes)
 	c.JSON(200, playState)
 }

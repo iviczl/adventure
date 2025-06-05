@@ -35,13 +35,25 @@ export const ColumnContainer = styled.section`
 export const ToolHeadBar = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: right;
+  justify-content: space-between;
   // align-items: right;
-  margin: 1rem;
+  margin: 1rem 1rem 0 1rem;
   padding-bottom: 0.5rem;
-  width:  calc(100%-2rem);
-  max-width: calc(100%-2rem);
+  width: calc(100% - 2rem);
+  max-width: calc(100% - 2rem);
   border-bottom: solid 1px #331111;
   background-color: #cc9977;
   color: #331111;
-}`
+  max-height: 4rem;
+  overflow: hidden;
+`
+
+export const AttributeList = styled.div`
+  padding: 0;
+  margin: 0;
+  // height: 100%;
+  max-height: 4rem; //calc(100% - 0.5rem);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+`
