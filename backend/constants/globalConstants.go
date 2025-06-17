@@ -9,6 +9,10 @@ import (
 )
 
 const (
+	CHANGE_PLAYER_ATTRIBUTES               types.ActionOperation = "cplat"
+	CHANGE_PLAYER_ABILITIES                types.ActionOperation = "cplab"
+	ADD_PLAYER_ABILITIES                   types.ActionOperation = "aplab"
+	ERASE_PLAYER_ABILITIES                 types.ActionOperation = "eplab"
 	CHANGE_POSITION                        types.ActionOperation = "cp"
 	CHANGE_POSITION_DESCRIPTION            types.ActionOperation = "cpd"
 	APPEND_POSITION_TEMPORARY_DESCRIPTION  types.ActionOperation = "aptd"

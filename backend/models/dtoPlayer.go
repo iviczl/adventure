@@ -1,13 +1,17 @@
 package models
 
 type DtoPlayer struct {
-	Name       string       `json:"name"`
-	Attributes []*Attribute `json:"attributes"`
+	Name       string          `json:"name"`
+	Attributes []*DtoAttribute `json:"attributes"`
 }
 
 func PlayerToDtoPlayer(player *Player) DtoPlayer {
+	var attributes []*DtoAttribute
+	for _, attr := range player.Attributes {
+		attributes = append(attributes, AttributeToDtoAttribute(attr))
+	}
 	return DtoPlayer{
 		Name:       player.Name,
-		Attributes: player.Attributes,
+		Attributes: attributes,
 	}
 }

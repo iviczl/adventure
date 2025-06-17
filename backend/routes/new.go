@@ -71,8 +71,6 @@ func New(c *gin.Context) {
 		return
 	}
 	adventure.Id = playId
-	adventure.ActualPosition.ActualPositionAdventureId = playId
-	adventure.ActualPosition.AdventureId = playId
 	actualPosition := models.AdjustedActualPosition(adventure.ActualPosition)
 	session.Values[fmt.Sprintf("%v:%v", userId, adventure.Id)] = adventure
 	fmt.Println("Session entry key created:", fmt.Sprintf("%v:%v", userId, adventure.Id))

@@ -12,6 +12,7 @@ type Action struct {
 	Code                        string                   `gorm:"size:10;not null" json:"code"`
 	Description                 string                   `gorm:"size:100;not null" json:"description"`
 	Operation                   types.ActionOperation    `gorm:"size:10;not null" json:"operation"`
+	Attributes                  []map[string]int         `json:"attributes"`
 	PositionCode                string                   `gorm:"size:10;" json:"positionCode"`
 	PositionDescription         string                   `gorm:"size:500;" json:"positionDescription"`
 	PositionVisited             bool                     `gorm:"default:true" json:"positionVisited"`

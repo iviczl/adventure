@@ -31,11 +31,11 @@ export default function ToolBar() {
   const attributeList = () => {
     return state.value.playerAttributes.map((attr) => (
       <>
-        <div>
-          <Label>{Object.keys(attr)[0]}:</Label>
+        <div key={attr.name}>
+          <Label>{attr.name}:</Label>
         </div>
-        <div>
-          <Label>{attr[Object.keys(attr)[0]]}</Label>
+        <div key={attr.name + '_value'}>
+          <Label>{attr.value}</Label>
         </div>
       </>
     ))

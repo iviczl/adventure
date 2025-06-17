@@ -1,1 +1,4 @@
-export type Attribute = Record<string, number>
+export type Attribute = {
+  name: string
+  value: number
+}

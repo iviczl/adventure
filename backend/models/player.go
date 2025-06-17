@@ -1,15 +1,24 @@
 package models
 
-// import "text-adventure/types"
+import "fmt"
 
-type Attribute map[string]int
+// import "text-adventure/types"
 
 type Player struct {
 	// Id         types.Guid   `gorm:"primaryKey;" json:"id"`
 	Name       string       `json:"name"`
 	Items      []*Item      `json:"items"`
 	Attributes []*Attribute `json:"attributes"`
-	Abilities  []*Attribute `json:"abilities"`
+	Abilities  []*Ability   `json:"abilities"`
+}
+
+func (player *Player) GetAttributeValue(attributeName string) (int, error) {
+	for i := range player.Attributes {
+		if (*player.Attributes[i]).Name == attributeName {
+			return (*player.Attributes[i]).Value, nil
+		}
+	}
+	return 0, fmt.Errorf("attribute %s not found", attributeName)
 }
 
 // getItem retrieves an item by its code from the player's inventory.
