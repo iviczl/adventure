@@ -22,6 +22,8 @@ type Action struct {
 	ActionCodes                 []string                 `gorm:"-" json:"actionCodes"`
 	ActionVisible               *bool                    `gorm:"default:true" json:"actionVisible"`
 	ActionActive                *bool                    `gorm:"default:true" json:"actionActive"`
+	NpcCode                     string                   `json:"npcCode"`
+	NpcInteracted               bool                     `json:"npcInteracted"`
 	Value                       string                   `gorm:"size:40" json:"value"`
 	Function                    map[string]interface{}   `gorm:"-" json:"function"`
 	Functions                   []map[string]interface{} `gorm:"-" json:"functions"`

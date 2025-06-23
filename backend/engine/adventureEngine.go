@@ -41,8 +41,8 @@ func (adventure *Adventure) executeEnteringActions() {
 	}
 	for i := range adventure.Npcs {
 		if adventure.Npcs[i].PositionCode == adventure.ActualPosition.Code {
-			for j := range adventure.Npcs[i].PlayerReactions {
-				action := adventure.Npcs[i].PlayerReactions[j]
+			for j := range adventure.Npcs[i].PlayerEnteringReactions {
+				action := adventure.Npcs[i].PlayerEnteringReactions[j]
 				if action.Active != nil && *action.Active {
 					err := adventure.ExecuteAction(action)
 					if err != nil {
@@ -112,6 +112,24 @@ func (adventure *Adventure) changeItemState(itemCode string, value string) error
 		return err
 	}
 	item.State = value
+	return nil
+}
+
+func (adventure *Adventure) changeNpcState(npcCode string, value string) error {
+	npc := adventure.GetNpc(npcCode)
+	if npc == nil {
+		return fmt.Errorf("invalid npcCode %s", npcCode)
+	}
+	npc.State = value
+	return nil
+}
+
+func (adventure *Adventure) changeNpcInteracted(npcCode string, value bool) error {
+	npc := adventure.GetNpc(npcCode)
+	if npc == nil {
+		return fmt.Errorf("invalid npcCode %s", npcCode)
+	}
+	npc.Interacted = value
 	return nil
 }
 
@@ -240,6 +258,12 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	case constants.CHANGE_ITEM_STATE:
 		return adventure.changeItemState(action.ItemCode, action.Value)
 
+	case constants.CHANGE_NPC_STATE:
+		return adventure.changeNpcState(action.NpcCode, action.Value)
+
+	case constants.CHANGE_NPC_INTERACTED:
+		return adventure.changeNpcInteracted(action.NpcCode, action.NpcInteracted)
+
 	case constants.PICK_UP_ITEM:
 		item := popItemFromList(&adventure.ActualPosition.Items, action.ItemCode)
 		if item == nil {
@@ -281,7 +305,7 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			}
 		}
 
-	case constants.LIST, constants.PLAYER_ENTERING_REACTION:
+	case constants.LIST:
 		for _, actionCode := range action.ActionCodes {
 			executable, err := adventure.findAction(actionCode)
 			if err == nil && executable != nil {

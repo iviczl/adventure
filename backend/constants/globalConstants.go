@@ -9,8 +9,6 @@ import (
 )
 
 const (
-	START                                  types.ActionOperation = "s"
-	PLAYER_ENTERING_REACTION               types.ActionOperation = "pler"
 	CHANGE_PLAYER_ATTRIBUTES               types.ActionOperation = "cplat"
 	CHANGE_PLAYER_ABILITIES                types.ActionOperation = "cplab"
 	ADD_PLAYER_ABILITIES                   types.ActionOperation = "aplab"
@@ -25,6 +23,8 @@ const (
 	CHANGE_ACTION_VISIBLE                  types.ActionOperation = "cav"
 	CHANGE_ITEM_DESCRIPTION                types.ActionOperation = "cad"
 	CHANGE_ITEM_STATE                      types.ActionOperation = "cis"
+	CHANGE_NPC_STATE                       types.ActionOperation = "cns"
+	CHANGE_NPC_INTERACTED                  types.ActionOperation = "cni"
 	PICK_UP_ITEM                           types.ActionOperation = "pui"
 	PUT_DOWN_ITEM                          types.ActionOperation = "pdi"
 	MOVE_ITEM                              types.ActionOperation = "moi"

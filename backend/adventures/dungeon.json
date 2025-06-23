@@ -39,34 +39,7 @@
         { "name": "strength", "value": 12 }
       ],
       "abilities": [],
-      "enteringActions": [
-        {
-          "code": "601",
-          "description": "",
-          "operation": "scon",
-          "functions": [
-            {
-              "conditions": [{ "npcCode": "1", "state": "dead" }],
-              "actionCodes": ["62"]
-            },
-            {
-              "conditions": [
-                { "npcCode": "1", "state": "alive" },
-                { "itemCode": "1", "state": "in hand" }
-              ],
-              "actionCodes": ["64", "65"]
-            },
-            {
-              "conditions": [
-                { "npcCode": "1", "state": "alive" },
-                { "itemCode": "1", "state": "in bag" }
-              ],
-              "actionCodes": ["63"]
-            }
-          ],
-          "active": true
-        }
-      ],
+      "enteringActions": [],
       "leavingActions": [],
       "availableActions": [
         {
@@ -96,14 +69,41 @@
         {
           "code": "65",
           "description": "kill orc",
-          "operation": "cis",
-          "itemCode": "3",
+          "operation": "cns",
+          "npcCode": "1",
           "value": "dead",
           "active": true,
           "visible": false
         }
       ],
-      "playerReactions": []
+      "playerEnteringReactions": [
+        {
+          "code": "601",
+          "description": "",
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "npcCode": "1", "state": "dead" }],
+              "actionCodes": ["62"]
+            },
+            {
+              "conditions": [
+                { "npcCode": "1", "state": "alive" },
+                { "itemCode": "1", "state": "in hand" }
+              ],
+              "actionCodes": ["64", "65"]
+            },
+            {
+              "conditions": [
+                { "npcCode": "1", "state": "alive" },
+                { "itemCode": "1", "state": "in bag" }
+              ],
+              "actionCodes": ["63"]
+            }
+          ],
+          "active": true
+        }
+      ]
     },
     {
       "code": "2",
