@@ -9,6 +9,8 @@ import (
 )
 
 const (
+	START                                  types.ActionOperation = "s"
+	PLAYER_ENTERING_REACTION               types.ActionOperation = "pler"
 	CHANGE_PLAYER_ATTRIBUTES               types.ActionOperation = "cplat"
 	CHANGE_PLAYER_ABILITIES                types.ActionOperation = "cplab"
 	ADD_PLAYER_ABILITIES                   types.ActionOperation = "aplab"

@@ -26,3 +26,17 @@ export const state = signal({
   adventureId: '',
   actualPosition: undefined,
 } as AppState)
+
+export function resetState() {
+  state.value = {
+    userName: '',
+    token: undefined,
+    player: '',
+    playerAttributes: [],
+    games: undefined,
+    plays: undefined,
+    selectedGameId: '',
+    adventureId: '',
+    actualPosition: undefined,
+  } as AppState
+}

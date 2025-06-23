@@ -39,6 +39,19 @@ func (adventure *Adventure) executeEnteringActions() {
 			break
 		}
 	}
+	for i := range adventure.Npcs {
+		if adventure.Npcs[i].PositionCode == adventure.ActualPosition.Code {
+			for j := range adventure.Npcs[i].PlayerReactions {
+				action := adventure.Npcs[i].PlayerReactions[j]
+				if action.Active != nil && *action.Active {
+					err := adventure.ExecuteAction(action)
+					if err != nil {
+						fmt.Printf("Error executing NPC player reaction: %s\n", err.Error())
+					}
+				}
+			}
+		}
+	}
 }
 
 func (adventure *Adventure) findAction(actionCode string) (*models.Action, error) {
@@ -115,6 +128,19 @@ func popItemFromList(items *[]*models.Item, itemCode string) *models.Item {
 	return nil
 }
 
+// popActionFromList removes an action with the given code from the list and returns it.
+func popActionFromList(actions *[]*models.Action, actionCode string) *models.Action {
+	for i, action := range *actions {
+		if action.Code == actionCode {
+			// Remove the item from the slice
+			removedAction := (*actions)[i]
+			*actions = append((*actions)[:i], (*actions)[i+1:]...)
+			return removedAction
+		}
+	}
+	return nil
+}
+
 // Execute performs the given action on the adventure.
 func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	fmt.Printf("EXECUTING ACTION %s\n", action.Code)
@@ -128,13 +154,17 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 		if action.PositionCode == "" {
 			return fmt.Errorf("missing position in action %s", action.Code)
 		}
-		// Leaving actions
-		adventure.executeLeavingActions()
+		if adventure.ActualPosition != nil {
+			// Leaving actions
+			adventure.executeLeavingActions()
+			adventure.cleanupPosition()
+		}
 		adventure.ActualPosition = adventure.GetPosition(action.PositionCode)
 		if adventure.ActualPosition == nil {
 			return fmt.Errorf("position not found: %s", action.PositionCode)
 		}
 		fmt.Printf("POSITION CHANGED TO %s\n", adventure.ActualPosition.Code)
+		adventure.initializePosition()
 		// Entering actions
 		adventure.executeEnteringActions()
 		adventure.ActualPosition.Visited = true
@@ -251,19 +281,11 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			}
 		}
 
-	case constants.LIST:
+	case constants.LIST, constants.PLAYER_ENTERING_REACTION:
 		for _, actionCode := range action.ActionCodes {
 			executable, err := adventure.findAction(actionCode)
 			if err == nil && executable != nil {
 				adventure.ExecuteAction(executable)
-			}
-			if executable.Code == "15" {
-				fmt.Println("ACTION AFTER CHANGE", action.Code, *action.Active)
-				foundAction, err := adventure.findAction("10")
-				if err == nil && foundAction != nil {
-					fmt.Println("FOUND ACTION", foundAction.Code, *foundAction.Active)
-					fmt.Println("ACTIONS ARE EQUAL", action == foundAction)
-				}
 			}
 		}
 
@@ -282,6 +304,37 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	return nil
 }
 
+func (adventure *Adventure) initializePosition() error {
+	if adventure.Npcs == nil {
+		return nil
+	}
+	for npcIndex := range adventure.Npcs {
+		if adventure.Npcs[npcIndex].PositionCode == adventure.ActualPosition.Code {
+			for actionIndex := range adventure.Npcs[npcIndex].EnteringActions {
+				action := adventure.Npcs[npcIndex].EnteringActions[actionIndex]
+				if action.Active != nil && *action.Active {
+					err := adventure.ExecuteAction(action)
+					if err != nil {
+						return fmt.Errorf("error executing NPC action: %s", err.Error())
+					}
+				}
+			}
+			adventure.ActualPosition.AvailableActions = append(adventure.ActualPosition.AvailableActions, adventure.Npcs[npcIndex].AvailableActions...)
+		}
+	}
+	return nil
+}
+
+func (adventure *Adventure) cleanupPosition() error {
+	for npcIndex := range adventure.Npcs {
+		for actionIndex := range adventure.Npcs[npcIndex].AvailableActions {
+			action := adventure.Npcs[npcIndex].AvailableActions[actionIndex]
+			popActionFromList(&adventure.ActualPosition.AvailableActions, action.Code)
+		}
+	}
+	return nil
+}
+
 func (adventure *Adventure) Start() error {
 	action := &models.Action{}
 	action.Operation = constants.CHANGE_POSITION
@@ -289,7 +342,13 @@ func (adventure *Adventure) Start() error {
 	activeVar := true
 	action.Active = &activeVar
 	adventure.Phase = models.STARTED
-	return adventure.ExecuteAction(action)
+	if err := adventure.ExecuteAction(action); err != nil {
+		return fmt.Errorf("error starting adventure: %s", err.Error())
+	}
+	if err := adventure.initializePosition(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (adventure *Adventure) Do(actionCode string) error {

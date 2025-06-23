@@ -34,12 +34,76 @@
       "interacted": false,
       "positionCode": "6",
       "items": [],
-      "attributes": [{ "health": 10 }, { "strength": 12 }],
+      "attributes": [
+        { "name": "health", "value": 10 },
+        { "name": "strength", "value": 12 }
+      ],
       "abilities": [],
-      "enteringActions": [],
+      "enteringActions": [
+        {
+          "code": "601",
+          "description": "",
+          "operation": "scon",
+          "functions": [
+            {
+              "conditions": [{ "npcCode": "1", "state": "dead" }],
+              "actionCodes": ["62"]
+            },
+            {
+              "conditions": [
+                { "npcCode": "1", "state": "alive" },
+                { "itemCode": "1", "state": "in hand" }
+              ],
+              "actionCodes": ["64", "65"]
+            },
+            {
+              "conditions": [
+                { "npcCode": "1", "state": "alive" },
+                { "itemCode": "1", "state": "in bag" }
+              ],
+              "actionCodes": ["63"]
+            }
+          ],
+          "active": true
+        }
+      ],
       "leavingActions": [],
-      "availableActions": [],
-      "onPlayerActions": []
+      "availableActions": [
+        {
+          "code": "62",
+          "description": "dead orc",
+          "operation": "aptd",
+          "positionDescription": "There is a dead orc on the ground.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "63",
+          "description": "dead by orc",
+          "operation": "cp",
+          "positionCode": "-5",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "64",
+          "description": "fight text",
+          "operation": "aptd",
+          "positionDescription": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed your skull. A filthy, disgusting orc that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The orc collapses clutching its throat from where a lot of blood gushes. It is dead.",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "65",
+          "description": "kill orc",
+          "operation": "cis",
+          "itemCode": "3",
+          "value": "dead",
+          "active": true,
+          "visible": false
+        }
+      ],
+      "playerReactions": []
     },
     {
       "code": "2",
@@ -473,14 +537,6 @@
     {
       "code": "6",
       "description": "You arrive in a big cavern with no walls whatsoever. It is relatively dry and very silent. Suddenly you see a small and uneven hut on your left and its design tells you that undoubtedly it is an orc hut. From behind the hut waves' noise can be heard faintly.",
-      "items": [
-        {
-          "code": "3",
-          "name": "orc",
-          "description": "a disgusting orc",
-          "state": "alive"
-        }
-      ],
       "availableActions": [
         {
           "code": "60",
@@ -494,67 +550,6 @@
           "description": "Go to the corridor",
           "operation": "cp",
           "positionCode": "5",
-          "active": true
-        },
-        {
-          "code": "62",
-          "description": "dead orc",
-          "operation": "aptd",
-          "positionDescription": "There is a dead orc on the ground.",
-          "active": true,
-          "visible": false
-        },
-        {
-          "code": "63",
-          "description": "dead by orc",
-          "operation": "cp",
-          "positionCode": "-5",
-          "active": true,
-          "visible": false
-        },
-        {
-          "code": "64",
-          "description": "fight text",
-          "operation": "aptd",
-          "positionDescription": "You hear a sudden noise behind and spin around holding the knife instinctively in front of you. This is your lucky move, because you are able to avert a heavy wooden club that almost crushed your skull. A filthy, disgusting orc that wields the club grunts in disappointment. But you do not give it a second chance, stab it in the chest with the knife and slash it in the neck as well. The orc collapses clutching its throat from where a lot of blood gushes. It is dead.",
-          "active": true,
-          "visible": false
-        },
-        {
-          "code": "65",
-          "description": "kill orc",
-          "operation": "cis",
-          "itemCode": "3",
-          "value": "dead",
-          "active": true,
-          "visible": false
-        }
-      ],
-      "enteringActions": [
-        {
-          "code": "601",
-          "description": "",
-          "operation": "scon",
-          "functions": [
-            {
-              "conditions": [{ "itemCode": "3", "state": "dead" }],
-              "actionCodes": ["62"]
-            },
-            {
-              "conditions": [
-                { "itemCode": "3", "state": "alive" },
-                { "itemCode": "1", "state": "in hand" }
-              ],
-              "actionCodes": ["64", "65"]
-            },
-            {
-              "conditions": [
-                { "itemCode": "3", "state": "alive" },
-                { "itemCode": "1", "state": "in bag" }
-              ],
-              "actionCodes": ["63"]
-            }
-          ],
           "active": true
         }
       ]

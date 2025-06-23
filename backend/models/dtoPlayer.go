@@ -8,7 +8,9 @@ type DtoPlayer struct {
 func PlayerToDtoPlayer(player *Player) DtoPlayer {
 	var attributes []*DtoAttribute
 	for _, attr := range player.Attributes {
-		attributes = append(attributes, AttributeToDtoAttribute(attr))
+		if attr.Attribute == "" { // Skip attributes that are bound to another
+			attributes = append(attributes, AttributeToDtoAttribute(attr))
+		}
 	}
 	return DtoPlayer{
 		Name:       player.Name,

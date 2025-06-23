@@ -94,6 +94,7 @@ func InitDbClient() {
 func init() {
 	gob.Register(make(map[string]interface{}))
 	gob.Register(&models.Item{})
+	gob.Register(&models.Npc{})
 	gob.Register(&models.Player{})
 	gob.Register(&models.Action{})
 	gob.Register(&models.Position{})

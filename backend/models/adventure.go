@@ -33,6 +33,7 @@ type Adventure struct {
 	ActualPosition    *Position      `gorm:"foreignKey:ActualPositionId"  json:"actualPosition"`
 	PlayerId          types.Guid     `gorm:"index" json:"playerId"` // Foreign key for Player
 	Player            *Player        `gorm:"foreignKey:PlayerId" json:"player"`
+	Npcs              []*Npc         `json:"npcs"`
 	Positions         []*Position    `gorm:"foreignKey:AdventureId" json:"positions"`                        // One-to-many relation to Position
 	AvailableActions  []*Action      `gorm:"foreignKey:AvailableActionsAdventureId" json:"availableActions"` // One-to-many relation to Action
 }
@@ -41,6 +42,15 @@ func (a *Adventure) BeforeCreate(tx *gorm.DB) error {
 	id, err := uuid.NewRandom()
 	a.Id = types.Guid(id)
 	return err
+}
+
+func (a *Adventure) GetNpc(npcCode string) *Npc {
+	for i := range a.Npcs {
+		if a.Npcs[i].Code == npcCode {
+			return a.Npcs[i]
+		}
+	}
+	return nil
 }
 
 // GetAction retrieves an action by its code from the adventure.
@@ -52,6 +62,14 @@ func (adventure *Adventure) GetAction(actionCode string) *Action {
 		for i := range adventure.AvailableActions {
 			if adventure.AvailableActions[i].Code == actionCode {
 				return adventure.AvailableActions[i]
+			}
+		}
+	}
+	if action == nil {
+		for i := range adventure.Npcs {
+			action = adventure.Npcs[i].GetAction(actionCode)
+			if action != nil {
+				return action
 			}
 		}
 	}

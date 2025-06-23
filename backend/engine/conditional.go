@@ -76,6 +76,16 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 				conditionsMet = conditionsMet && (item.State == state.(string))
 			}
 
+		} else if npcCode, ok := condition["npcCode"]; ok {
+			npc := adventure.GetNpc(npcCode.(string))
+			if npc == nil {
+				panic(fmt.Sprintf("Not existing npc %s.", npcCode))
+			}
+			if name, ok := condition["name"]; ok {
+				conditionsMet = conditionsMet && (npc.Name == name.(string))
+			} else if state, ok := condition["state"]; ok {
+				conditionsMet = conditionsMet && (npc.State == state.(string))
+			}
 		} else {
 			fmt.Println("NOTHING")
 		}

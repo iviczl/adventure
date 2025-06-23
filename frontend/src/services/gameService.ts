@@ -1,5 +1,5 @@
 import { Position } from '../types/position'
-import { state } from '../state'
+import { resetState, state } from '../state'
 import { GameInfo } from '../types/gameInfo'
 import { LoginResponse } from '../types/loginResponse'
 import { PlayInfo } from '../types/play'
@@ -163,6 +163,9 @@ export async function doFetch(url: string, options = {} as RequestInit) {
     const signal = abortController.signal
     const res = await fetch(url, { ...options, credentials: 'include', signal })
     if (!res.ok) {
+      if (res.status === 401) {
+        resetState()
+      }
       throw new Error(`An error happened: ${res.statusText}`)
     }
     response = await res.json()
