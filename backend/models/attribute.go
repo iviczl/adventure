@@ -8,6 +8,8 @@ type Attribute struct {
 	Attribute string `json:"attribute"`
 	Value     int    `json:"value"`
 	MaxValue  int    `json:"maxValue"` // Maximum value for the attribute
+	MinValue  int    `json:"minValue"` // Minimum value for the attribute
+	Vital     bool   `json:"vital"`    // Indicates if the attribute is vital for the player
 }
 
 func (a *Attribute) UnmarshalJSON(text []byte) error {

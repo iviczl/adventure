@@ -1,7 +1,8 @@
 {
   "code": "dungeon",
   "title": "Dungeon Mission",
-  "description": "Your task is to clear out a dangerous dungeon. (This is a test mission to try out the capabilities of the adventure engine, so it is a small one.)",
+  "description": "Your task is to discover a dangerous dungeon. (This is a test mission to try out the capabilities of the adventure engine, so it is a small one.)",
+  "automaticChange": true,
   "player": {
     "name": "",
     "items": [
@@ -13,7 +14,7 @@
       }
     ],
     "attributes": [
-      { "name": "health", "value": 10 },
+      { "name": "health", "value": 10, "vital": true },
       { "name": "dexterity", "value": 10 },
       { "name": "mana", "value": 10 },
       { "name": "strength", "value": 10 },
@@ -21,8 +22,33 @@
       { "name": "manaRecovery", "attribute": "mana", "value": 1 }
     ],
     "abilities": [
-      { "name": "fireball", "attribute": "mana", "cost": 2, "active": true },
-      { "name": "heal", "attribute": "mana", "cost": 4, "active": true }
+      {
+        "name": "slash",
+        "attribute": "strength",
+        "cost": 1,
+        "chance": 0.9,
+        "targetAttribute": "health",
+        "targetDamage": 5,
+        "active": true
+      },
+      {
+        "name": "heal",
+        "attribute": "mana",
+        "cost": 8,
+        "chance": 1.0,
+        "targetAttribute": "health",
+        "targetDamage": -5,
+        "active": true
+      },
+      {
+        "name": "fireball",
+        "attribute": "mana",
+        "cost": 8,
+        "chance": 0.5,
+        "targetAttribute": "health",
+        "targetDamage": 15,
+        "active": true
+      }
     ]
   },
   "npcs": [
@@ -33,14 +59,6 @@
       "state": "alive",
       "interacted": false,
       "positionCode": "6",
-      "items": [],
-      "attributes": [
-        { "name": "health", "value": 10 },
-        { "name": "strength", "value": 12 }
-      ],
-      "abilities": [],
-      "enteringActions": [],
-      "leavingActions": [],
       "availableActions": [
         {
           "code": "62",
@@ -109,7 +127,140 @@
       "code": "2",
       "name": "snake demon",
       "description": "a snake demon",
-      "state": "alive"
+      "state": "alive",
+      "loseState": "dead",
+      "interacted": false,
+      "positionCode": "4",
+      "attributes": [
+        { "name": "health", "value": 10, "vital": true },
+        { "name": "strength", "value": 12 }
+      ],
+      "abilities": [
+        {
+          "name": "bite",
+          "attribute": "strength",
+          "cost": 0,
+          "chance": 0.9,
+          "targetAttribute": "health",
+          "targetDamage": 10,
+          "active": true
+        }
+      ],
+      "availableActions": [
+        {
+          "code": "40",
+          "description": "Make your move",
+          "operation": "ran",
+          "actionCodes": ["41", "42", "43"],
+          "active": true
+        },
+        {
+          "code": "41",
+          "description": "fight",
+          "operation": "an",
+          "npcCode": "2",
+          "actionCodes": ["44"],
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "42",
+          "description": "unlucky end",
+          "operation": "cp",
+          "positionCode": "-3",
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "43",
+          "description": "fairly lucky end",
+          "operation": "cp",
+          "positionCode": "-4",
+          "visible": false
+        },
+        {
+          "code": "44",
+          "description": "after fight",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "npcCode": "2", "state": "dead" }],
+            "actionCodes": ["45", "47", "48"],
+            "elseActionCodes": ["-6"]
+          },
+          "visible": false
+        },
+        {
+          "code": "45",
+          "description": "victory",
+          "operation": "cptd",
+          "positionDescription": "You turn and slash with your knife horizontally in neck height and jump back. From the dim light a big snake demon appears severely wounded. The demon drops dead, but still twitching. You are relieved that you survived and just realize what could have happened if you were just a bit slower.",
+          "visible": false
+        },
+        {
+          "code": "46",
+          "description": "clear fight action and add exit",
+          "operation": "ls",
+          "actionCodes": ["47, 48"],
+          "visible": false
+        },
+        {
+          "code": "47",
+          "description": "inactivate fight action",
+          "operation": "caa",
+          "actionCode": "40",
+          "actionActive": false,
+          "visible": false
+        },
+        {
+          "code": "48",
+          "description": "open exit",
+          "operation": "caa",
+          "actionCode": "400",
+          "actionActive": true,
+          "visible": false
+        },
+        {
+          "code": "49",
+          "description": "dead demon",
+          "operation": "aptd",
+          "positionDescription": "A dead snake demon lays flat on the floor.",
+          "visible": false
+        },
+        {
+          "code": "491",
+          "description": "demon lurking text",
+          "operation": "pptd",
+          "positionDescription": "As you are advancing forward the smell becomes really stomach lurching so you become very nervous.",
+          "visible": false
+        },
+        {
+          "code": "492",
+          "description": "something is wrong text",
+          "operation": "aptd",
+          "positionDescription": "As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
+          "visible": false
+        },
+        {
+          "code": "493",
+          "description": "close exit",
+          "operation": "caa",
+          "actionCode": "400",
+          "actionActive": false,
+          "visible": false
+        }
+      ],
+      "playerEnteringReactions": [
+        {
+          "code": "401",
+          "description": "dead demon or alive lurking text",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "npcCode": "2", "state": "dead" }],
+            "actionCodes": ["49"],
+            "elseActionCodes": ["491", "492", "493"]
+          }
+        }
+      ]
     }
   ],
   "startPositionCode": "0",
@@ -346,7 +497,7 @@
     },
     {
       "code": "3",
-      "description": "You arrived to a small round chamber that looks like some man made cellar. You look around and see nothing except some tattered rags next to the wall on the floor. The walls are smooth and seeing sooth on the arched ceiling indicates someone else also used a torch here. The only other way apart from the entrance is a narrow doorway forward from where a really foul stench comes.",
+      "description": "You arrived to a small round chamber that looks like some man made cellar. You look around and see nothing except some tattered rags next to the wall on the floor. The walls are smooth and seeing sooth on the arched ceiling indicates someone else also used a torch here, which sounds somewhat crazy because the dungeon just came to be. The only other way apart from the entrance is a narrow doorway forward from where a really foul stench comes.",
       "items": [
         {
           "code": "1",
@@ -422,36 +573,25 @@
     },
     {
       "code": "4",
-      "description": "As you are advancing forward the smell becomes really stomach lurching so you become very nervous. You arrive to a huge room where you cannot see anything but your immediate surroundings. As you go forward you hear a slithering noise behind you that comes from very close. You know that you have time for only a quick move.",
+      "description": "You arrive to a huge room where you cannot see anything but your immediate surroundings.",
       "availableActions": [
         {
-          "code": "40",
-          "description": "Make your move",
-          "operation": "ran",
-          "actionCodes": ["41", "42"],
+          "code": "400",
+          "description": "Go back",
+          "operation": "cp",
+          "positionCode": "3",
           "active": true
-        },
-        {
-          "code": "41",
-          "description": "lucky end",
-          "operation": "cp",
-          "positionCode": "-4",
-          "active": true,
-          "visible": false
-        },
-        {
-          "code": "42",
-          "description": "unlucky end",
-          "operation": "cp",
-          "positionCode": "-3",
-          "active": true,
-          "visible": false
         }
       ]
     },
     {
       "code": "-3",
       "description": "You turn around on your heel quickly, but somewhat late. You sense as something sharp sinks in your neck. As you turn you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
+      "endPosition": true
+    },
+    {
+      "code": "-6",
+      "description": "You slash with your knife and you jump back, but somewhat late. You sense as the demon's fangs sink in your left thigh. As you still see a big snake demon in front of you, but your whole body goes numb and you fall. The world becomes dark and you cannot see anymore. Your adventure ends here.",
       "endPosition": true
     },
     {

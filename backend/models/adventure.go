@@ -27,6 +27,7 @@ type Adventure struct {
 	Code              string         `gorm:"size:10;not null" json:"code"`
 	Title             string         `gorm:"size:60;not null" json:"title"`
 	Description       string         `gorm:"size:100;not null" json:"description"`
+	AutomaticChange   bool           `json:"automaticChange"`
 	StartPositionCode string         `gorm:"size:10;not null" json:"startPositionCode"`
 	Phase             AdventurePhase `gorm:"type:varchar(255);default:'-1'" json:"phase"`
 	ActualPositionId  types.Guid     `gorm:"index" json:"actualPositionId"` // Foreign key for Position

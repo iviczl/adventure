@@ -5,6 +5,7 @@ type Npc struct {
 	Name                    string       `json:"name"`
 	Description             string       `json:"description"`
 	State                   string       `json:"state"`
+	LoseState               string       `json:"loseState"`
 	Interacted              bool         `json:"interacted"`
 	PositionCode            string       `json:"positionCode"`
 	Items                   []*Item      `json:"items"`
@@ -41,6 +42,24 @@ func (npc *Npc) GetAction(actionCode string) *Action {
 	for i := range npc.PlayerReactions {
 		if npc.PlayerReactions[i].Code == actionCode {
 			return npc.PlayerReactions[i]
+		}
+	}
+	return nil
+}
+
+func (npc *Npc) GetVitalAttribute() *Attribute {
+	for _, attribute := range npc.Attributes {
+		if attribute.Vital {
+			return attribute
+		}
+	}
+	return nil
+}
+
+func (npc *Npc) GetAttribute(attributeName string) *Attribute {
+	for i := range npc.Attributes {
+		if npc.Attributes[i].Name == attributeName {
+			return npc.Attributes[i]
 		}
 	}
 	return nil

@@ -8,44 +8,29 @@ import (
 )
 
 type Action struct {
-	// Id                          types.Guid               `gorm:"primaryKey;" json:"id"`
-	Code                        string                   `gorm:"size:10;not null" json:"code"`
-	Description                 string                   `gorm:"size:100;not null" json:"description"`
-	Operation                   types.ActionOperation    `gorm:"size:10;not null" json:"operation"`
-	Attributes                  []map[string]int         `json:"attributes"`
-	PositionCode                string                   `gorm:"size:10;" json:"positionCode"`
-	PositionDescription         string                   `gorm:"size:500;" json:"positionDescription"`
-	PositionVisited             bool                     `gorm:"default:true" json:"positionVisited"`
-	ItemCode                    string                   `gorm:"size:10" json:"itemCode"`
-	ItemDescription             string                   `gorm:"size:500" json:"itemDescription"`
-	ActionCode                  string                   `gorm:"size:10" json:"actionCode"`
-	ActionCodes                 []string                 `gorm:"-" json:"actionCodes"`
-	ActionVisible               *bool                    `gorm:"default:true" json:"actionVisible"`
-	ActionActive                *bool                    `gorm:"default:true" json:"actionActive"`
-	NpcCode                     string                   `json:"npcCode"`
-	NpcInteracted               bool                     `json:"npcInteracted"`
-	Value                       string                   `gorm:"size:40" json:"value"`
-	Function                    map[string]interface{}   `gorm:"-" json:"function"`
-	Functions                   []map[string]interface{} `gorm:"-" json:"functions"`
-	Active                      *bool                    `gorm:"default:true;not null" json:"active"`
-	Visible                     *bool                    `gorm:"default:true;not null" json:"visible"`
-	AvailableActionsPositionId  types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
-	EnteringActionsPositionId   types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
-	LeavingActionsPositionId    types.Guid               `gorm:"index" json:"-"` // Foreign Key to Position
-	AvailableActionsAdventureId types.Guid               `gorm:"index" json:"-"` // Foreign Key to Adventure
-
-	// Relationships
-	AvailableActionsPosition  Position  `gorm:"foreignKey:AvailableActionsPositionId" json:"-"`
-	EnteringActionsPosition   Position  `gorm:"foreignKey:EnteringActionsPositionId" json:"-"`
-	LeavingActionsPosition    Position  `gorm:"foreignKey:LeavingActionsPositionId" json:"-"`
-	AvailableActionsAdventure Adventure `gorm:"foreignKey:AvailableActionsAdventureId" json:"-"`
+	Code                string                   `gorm:"size:10;not null" json:"code"`
+	Description         string                   `gorm:"size:100;not null" json:"description"`
+	Operation           types.ActionOperation    `gorm:"size:10;not null" json:"operation"`
+	Attributes          map[string]int           `json:"attributes"`
+	Abilities           map[string]bool          `json:"abilities"`
+	PositionCode        string                   `gorm:"size:10;" json:"positionCode"`
+	PositionDescription string                   `gorm:"size:500;" json:"positionDescription"`
+	PositionVisited     bool                     `gorm:"default:true" json:"positionVisited"`
+	ItemCode            string                   `gorm:"size:10" json:"itemCode"`
+	ItemDescription     string                   `gorm:"size:500" json:"itemDescription"`
+	ActionCode          string                   `gorm:"size:10" json:"actionCode"`
+	ActionCodes         []string                 `json:"actionCodes"`
+	ElseActionCodes     []string                 `json:"elseActionCodes"`
+	ActionVisible       *bool                    `gorm:"default:true" json:"actionVisible"`
+	ActionActive        *bool                    `gorm:"default:true" json:"actionActive"`
+	NpcCode             string                   `json:"npcCode"`
+	NpcInteracted       bool                     `json:"npcInteracted"`
+	Value               string                   `gorm:"size:40" json:"value"`
+	Function            map[string]interface{}   `gorm:"-" json:"function"`
+	Functions           []map[string]interface{} `gorm:"-" json:"functions"`
+	Active              *bool                    `gorm:"default:true;not null" json:"active"`
+	Visible             *bool                    `gorm:"default:true;not null" json:"visible"`
 }
-
-// func (a *Action) BeforeCreate(tx *gorm.DB) error {
-// 	id, err := uuid.NewRandom()
-// 	a.Id = types.Guid(id)
-// 	return err
-// }
 
 func (a *Action) UnmarshalJSON(text []byte) error {
 	type Alias Action

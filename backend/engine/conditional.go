@@ -83,8 +83,8 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 			}
 			if name, ok := condition["name"]; ok {
 				conditionsMet = conditionsMet && (npc.Name == name.(string))
-			} else if state, ok := condition["state"]; ok {
-				conditionsMet = conditionsMet && (npc.State == state.(string))
+			} else if state, ok := condition["state"].(string); ok {
+				conditionsMet = conditionsMet && (npc.State == state)
 			}
 		} else {
 			fmt.Println("NOTHING")

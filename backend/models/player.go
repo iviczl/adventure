@@ -36,3 +36,21 @@ func (player *Player) GetItem(itemCode string) *Item {
 // 	p.Id = types.Guid(id)
 // 	return err
 // }
+
+func (player *Player) GetVitalAttribute() *Attribute {
+	for _, attribute := range player.Attributes {
+		if attribute.Vital {
+			return attribute
+		}
+	}
+	return nil
+}
+
+func (player *Player) GetAttribute(attributeName string) *Attribute {
+	for i := range player.Attributes {
+		if player.Attributes[i].Name == attributeName {
+			return player.Attributes[i]
+		}
+	}
+	return nil
+}

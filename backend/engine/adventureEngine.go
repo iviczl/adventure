@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"math/rand"
+	"slices"
 	"text-adventure/constants"
 	"text-adventure/models"
 )
@@ -168,6 +169,68 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 	}
 
 	switch action.Operation {
+	case constants.CHANGE_PLAYER_ATTRIBUTES:
+		if action.Attributes == nil {
+			return fmt.Errorf("missing attributes in action %s", action.Code)
+		}
+		for key, value := range action.Attributes {
+			index := slices.IndexFunc(adventure.Player.Attributes, func(attr *models.Attribute) bool {
+				return attr.Name == key
+			})
+			if index == -1 {
+				return fmt.Errorf("attribute %s not found in player attributes", key)
+			}
+			adventure.Player.Attributes[index].Value = value
+		}
+	case constants.CHANGE_PLAYER_ABILITIES:
+		if action.Abilities == nil {
+			return fmt.Errorf("missing abilities in action %s", action.Code)
+		}
+		for key, value := range action.Abilities {
+			index := slices.IndexFunc(adventure.Player.Abilities, func(abi *models.Ability) bool {
+				return abi.Name == key
+			})
+			if index == -1 {
+				return fmt.Errorf("ability %s not found in player abilities", key)
+			}
+			adventure.Player.Abilities[index].Active = value
+		}
+	case constants.CHANGE_NPC_ATTRIBUTES:
+		if action.Attributes == nil {
+			return fmt.Errorf("missing attributes in action %s", action.Code)
+		}
+		if action.NpcCode == "" {
+			return fmt.Errorf("missing npcCode in action %s", action.Code)
+		}
+		npc := adventure.GetNpc(action.NpcCode)
+		for key, value := range action.Attributes {
+			index := slices.IndexFunc(npc.Attributes, func(attr *models.Attribute) bool {
+				return attr.Name == key
+			})
+			if index == -1 {
+				return fmt.Errorf("attribute %s not found in npc attributes", key)
+			}
+			npc.Attributes[index].Value = value
+		}
+	case constants.CHANGE_NPC_ABILITIES:
+		if action.Abilities == nil {
+			return fmt.Errorf("missing abilities in action %s", action.Code)
+		}
+		if action.NpcCode == "" {
+			return fmt.Errorf("missing npcCode in action %s", action.Code)
+		}
+		npc := adventure.GetNpc(action.NpcCode)
+		for key, value := range action.Abilities {
+			index := slices.IndexFunc(npc.Abilities, func(abi *models.Ability) bool {
+				return abi.Name == key
+			})
+			if index == -1 {
+				return fmt.Errorf("ability %s not found in npc abilities", key)
+			}
+			npc.Abilities[index].Active = value
+		}
+	case constants.ATTACK_NPC:
+		return FightWithNpc(adventure, action)
 	case constants.CHANGE_POSITION:
 		if action.PositionCode == "" {
 			return fmt.Errorf("missing position in action %s", action.Code)
@@ -220,7 +283,11 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position = adventure.ActualPosition
 		}
 		if position != nil {
-			position.TemporaryDescription = position.Description + " " + action.PositionDescription
+			description := position.Description
+			if position.TemporaryDescription != "" {
+				description = position.TemporaryDescription
+			}
+			position.TemporaryDescription = description + " " + action.PositionDescription
 		}
 
 	case constants.PREPEND_POSITION_TEMPORARY_DESCRIPTION:
@@ -231,7 +298,11 @@ func (adventure *Adventure) ExecuteAction(action *models.Action) error {
 			position = adventure.ActualPosition
 		}
 		if position != nil {
-			position.TemporaryDescription = action.PositionDescription + " " + position.Description
+			description := position.Description
+			if position.TemporaryDescription != "" {
+				description = position.TemporaryDescription
+			}
+			position.TemporaryDescription = action.PositionDescription + " " + description
 		}
 		fmt.Println("PREPEND POSITION TEMPORARY DESCRIPTION ", action.Visible)
 
