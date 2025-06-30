@@ -16,8 +16,7 @@ func conditional(function map[string]interface{}, adventure *Adventure) bool {
 			if error != nil {
 				panic(fmt.Sprintf("Attribute not found: %s", attributeCode))
 			}
-			equalsValue, exists := condition["equals"].(int)
-			if exists {
+			if equalsValue, exists := condition["equals"].(int); exists {
 				conditionsMet = conditionsMet && (attributeValue == equalsValue)
 			} else if greaterThanValue, exists := condition["greaterThan"].(int); exists {
 				conditionsMet = conditionsMet && (attributeValue > greaterThanValue)

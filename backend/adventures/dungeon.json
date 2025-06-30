@@ -150,16 +150,37 @@
         {
           "code": "40",
           "description": "Make your move",
+          "operation": "con",
+          "function": {
+            "conditions": [{ "playerMustHave": true, "itemCode": "1" }],
+            "actionCodes": ["411"],
+            "elseActionCodes": ["412"]
+          },
+          "active": true
+        },
+        {
+          "code": "411",
+          "description": "chance to fight",
           "operation": "ran",
           "actionCodes": ["41", "42", "43"],
-          "active": true
+          "active": true,
+          "visible": false
+        },
+        {
+          "code": "412",
+          "description": "no chance to fight",
+          "operation": "ran",
+          "actionCodes": ["42", "43"],
+          "active": true,
+          "visible": false
         },
         {
           "code": "41",
           "description": "fight",
           "operation": "an",
           "npcCode": "2",
-          "actionCodes": ["44"],
+          "actionCodes": ["45", "47", "48"],
+          "elseActionCodes": ["-6"],
           "active": true,
           "visible": false
         },
@@ -179,21 +200,10 @@
           "visible": false
         },
         {
-          "code": "44",
-          "description": "after fight",
-          "operation": "con",
-          "function": {
-            "conditions": [{ "npcCode": "2", "state": "dead" }],
-            "actionCodes": ["45", "47", "48"],
-            "elseActionCodes": ["-6"]
-          },
-          "visible": false
-        },
-        {
           "code": "45",
           "description": "victory",
           "operation": "cptd",
-          "positionDescription": "You turn and slash with your knife horizontally in neck height and jump back. From the dim light a big snake demon appears severely wounded. The demon drops dead, but still twitching. You are relieved that you survived and just realize what could have happened if you were just a bit slower.",
+          "positionDescription": "You quickly pull out your knife, turn and slash with it horizontally in neck height and jump back. From the dim light a big snake demon appears severely wounded. The demon drops dead, but still twitching. You are relieved that you survived and just realize what could have happened if you were just a bit slower. You swipe your knife clean on the demon's scales and put it back in your bag.",
           "visible": false
         },
         {
