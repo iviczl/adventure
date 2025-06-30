@@ -6,9 +6,7 @@ import { PlayInfo } from '../types/play'
 import { PlayState } from '../types/playState'
 
 let abortController: AbortController
-const portExpression = import.meta.env.VITE_SERVICE_PORT
-  ? `:${import.meta.env.VITE_SERVICE_PORT}`
-  : ''
+const portExpression = import.meta.env.VITE_SERVICE_PORT ? `:${import.meta.env.VITE_SERVICE_PORT}` : ''
 const apiBasePath = import.meta.env.VITE_SERVICE_HOST + portExpression
 
 export async function save() {
@@ -120,11 +118,7 @@ export async function startGame(gameId: string, player: string) {
   console.log('ATTRIBUTES', playState.player.attributes)
 }
 
-export async function takeAction(
-  actionId: string,
-  player: string,
-  adventureId: string
-) {
+export async function takeAction(actionId: string, player: string, adventureId: string) {
   abortController = new AbortController()
   const result = await doFetch(`${apiBasePath}/do`, {
     method: 'POST',
@@ -135,10 +129,12 @@ export async function takeAction(
   if (assertError(result)) {
     return
   }
-  const position = (await result.response) as Position
+  const playState = (await result.response) as PlayState
   state.value = {
     ...state.value,
-    actualPosition: position,
+    player: playState.player.name,
+    playerAttributes: playState.player.attributes,
+    actualPosition: playState.actualPosition,
   }
 }
 

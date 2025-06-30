@@ -59,5 +59,8 @@ func Do(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, models.PositionToDtoPosition(actualPosition))
+	c.JSON(200, &models.DtoPlayState{
+		Player:         models.PlayerToDtoPlayer(adventure.Player),
+		ActualPosition: models.PositionToDtoPosition(actualPosition),
+	})
 }

@@ -60,12 +60,13 @@ func autoFight(adventure *Adventure, npcCode string) (bool, error) {
 		var playerChosenAttackAbility *models.Ability
 		var playerCostAttribute *models.Attribute
 		for _, ability := range player.Abilities {
-			playerCostAttribute = player.GetAttribute(ability.Attribute)
-			if !ability.Active || ability.TargetDamage <= 0 || ability.Cost >= playerCostAttribute.Value {
+			costAttribute := player.GetAttribute(ability.Attribute)
+			if !ability.Active || ability.TargetDamage <= 0 || ability.Cost >= costAttribute.Value {
 				continue
 			}
 			if playerChosenAttackAbility == nil || ability.Chance > playerChosenAttackAbility.Chance {
 				playerChosenAttackAbility = ability
+				playerCostAttribute = costAttribute
 			}
 		}
 		if playerChosenAttackAbility == nil {
@@ -74,12 +75,13 @@ func autoFight(adventure *Adventure, npcCode string) (bool, error) {
 		var npcChosenAttackAbility *models.Ability
 		var npcCostAttribute *models.Attribute
 		for _, ability := range npc.Abilities {
-			npcCostAttribute = npc.GetAttribute(ability.Attribute)
-			if !ability.Active || ability.TargetDamage <= 0 || ability.Cost >= npcCostAttribute.Value {
+			costAttribute := npc.GetAttribute(ability.Attribute)
+			if !ability.Active || ability.TargetDamage <= 0 || ability.Cost >= costAttribute.Value {
 				continue
 			}
 			if npcChosenAttackAbility == nil || ability.Chance > npcChosenAttackAbility.Chance {
 				npcChosenAttackAbility = ability
+				npcCostAttribute = costAttribute
 			}
 		}
 		if npcChosenAttackAbility == nil {
