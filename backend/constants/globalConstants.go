@@ -46,3 +46,4 @@ var DbPath string = filepath.Join(".", "db", "text-adventure.db")
 const SecretKey = "my_secret_key"
 const SessionName = "session"
 const SessionSecret = "WYVOEWXHLUDB34DAELL2LDYNJSLEZT5WZRLPLHIQE5JXOGYCGIZQ"
+const SessionMaxAge = 600

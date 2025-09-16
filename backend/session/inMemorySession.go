@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -18,7 +19,8 @@ type InMemoryStore struct {
 	mu       sync.RWMutex
 }
 
-const maxAge = 86400 * 30 // 30 days
+const maxAge = 600 // 10 minutes
+// 86400 * 30 // 30 days
 // NewInMemoryStore creates a new in-memory session store.
 func NewInMemoryStore(keyPairs ...[]byte) *InMemoryStore {
 	store := &InMemoryStore{
@@ -62,15 +64,22 @@ func (store *InMemoryStore) Get(r *http.Request, name string) (*sessions.Session
 	}
 	exists := false
 	for j := range store.sessions {
-		encoded, err := securecookie.EncodeMulti(store.sessions[j].Name(), store.sessions[j].ID, store.Codecs...)
-		if err != nil {
-			return nil, fmt.Errorf("sessions: invalid session content: %s", err.Error())
+		// encoded, err := securecookie.EncodeMulti(store.sessions[j].Name(), store.sessions[j].ID, store.Codecs...)
+		// if err != nil {
+		// 	return nil, fmt.Errorf("sessions: invalid session content: %s", err.Error())
+		// }
+		// if cookie.Value == encoded {
+		if isOldSession(store.sessions[j]) {
+			// Session is old, delete it
+			if err := store.delete(store.sessions[j]); err != nil {
+				return nil, err
+			}
+			continue
 		}
-
-		if cookie.Name == encoded {
+		if cookie.Value == store.sessions[j].ID {
+			exists = true
+			session = store.sessions[j]
 		}
-		exists = true
-		session = store.sessions[j]
 	}
 	if !exists {
 		// Create a new session if it doesn't exist
@@ -92,39 +101,53 @@ func (store *InMemoryStore) New(r *http.Request, name string) (*sessions.Session
 
 var base32RawStdEncoding = base32.StdEncoding.WithPadding(base32.NoPadding)
 
+const lastSaveKey = "_last_save"
+
+// isOldSession decides that the session have expired based on MaxAge.
+func isOldSession(session *sessions.Session) bool {
+	var lastSave time.Time
+	if flashes := session.Flashes(lastSaveKey); len(flashes) > 0 {
+		if t, ok := flashes[0].(time.Time); ok {
+			lastSave = t
+		}
+	} else {
+		return false
+	}
+	return int64(session.Options.MaxAge) <= int64(time.Since(lastSave).Seconds())
+}
+
 // Save saves the session to the in-memory store.
 func (store *InMemoryStore) Save(r *http.Request, w http.ResponseWriter, session *sessions.Session) error {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	// Delete if max-age is <= 0
-	if session.Options.MaxAge <= 0 {
+	if isOldSession(session) {
 		if err := store.delete(session); err != nil {
 			return err
 		}
 		http.SetCookie(w, sessions.NewCookie(session.Name(), "", session.Options))
 		return nil
 	}
-	if session.ID == "" {
-		// Because the ID is used in the filename, encode it to
-		// use alphanumeric characters only.
-		session.ID = base32RawStdEncoding.EncodeToString(
-			securecookie.GenerateRandomKey(32))
-	}
-	store.sessions[session.Name()] = session
 
-	encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
-		store.Codecs...)
-	if err != nil {
-		return err
+	if session.ID == "" {
+		session.ID = base32RawStdEncoding.EncodeToString(securecookie.GenerateRandomKey(32))
 	}
-	http.SetCookie(w, sessions.NewCookie(session.Name(), encoded, session.Options))
+	session.AddFlash(time.Now(), lastSaveKey)
+	store.sessions[session.ID] = session
+
+	//  encoded, err := securecookie.EncodeMulti(session.Name(), session.ID,
+	// 	store.Codecs...)
+	// if err != nil {
+	// 	return err
+	// }
+	// http.SetCookie(w, sessions.NewCookie(session.Name(), encoded, session.Options))
+	http.SetCookie(w, sessions.NewCookie(session.Name(), session.ID, session.Options))
 	return nil
 }
 
 // delete session
 func (store *InMemoryStore) delete(session *sessions.Session) error {
-	delete(store.sessions, session.Name())
+	delete(store.sessions, session.ID)
 	return nil
 }
 

@@ -46,7 +46,7 @@ func CorsMiddleware() gin.HandlerFunc {
 func InitSessionStore() {
 	constants.SessionStore = session.NewInMemoryStore([]byte(constants.SessionSecret))
 	constants.SessionStore.Options = &sessions.Options{
-		MaxAge:   86400 * 30,
+		MaxAge:   constants.SessionMaxAge,
 		SameSite: http.SameSiteNoneMode,
 		Secure:   true,
 		HttpOnly: true,
